@@ -55,37 +55,15 @@ public class SparqlHelper {
 
             while (results.hasNext()) {
                 QuerySolution sol = results.next();
-
+                ResultVariables resultVariables = new ResultVariables();
                 //get artist
-                if (sol.get("artist") == null) {
-                    artist = null;
-                } else if (sol.get("artist").isLiteral()) {
-                    artist = sol.getLiteral("artist").toString();
-                } else {
-                    artist = sol.getResource("artist").getURI().substring(28);
-                }
-                System.out.println("artist: " + artist);
+               artist = resultVariables.getArtist(sol);
 
                 //get dboStartYear
-                if (sol.get("dboStartYear") == null) {
-                    startYear = null;
-                } else if (sol.get("dboStartYear").isLiteral()) {
-                    startYear = sol.getLiteral("dboStartYear").toString().substring(0, 4);
-                    int startYearInt = Integer.valueOf(startYear);
-                } else {
-                    startYear = sol.getResource("dboStartYear").getURI();
-                }
-                System.out.println("startYear: " + startYear);
+                startYear = resultVariables.getStartYear(sol);
 
                 //get dboEndYear (if available)
-                if (sol.get("dboEndYear") == null) {
-                    endYear = null;
-                } else if (sol.get("dboEndYear").isLiteral()) {
-                    endYear = sol.getLiteral("dboEndYear").toString().substring(0, 4);
-                } else {
-                    endYear = sol.getResource("dboEndYear").getURI();
-                }
-                System.out.println("endYear: " + endYear);
+               endYear = resultVariables.getEndYear(sol);
 
                /* for (String var : columnNames) {
 
