@@ -27,6 +27,7 @@ public class SparqlHelper {
     public Question getNewQuestion() {
        // String[] q = new String[5]; //index: 0=question, 1=right answer, 1-4=answer choices
         Question q = new Question();
+        QueryString qs = new QueryString();
 
         String queryString = "";
         String artist = "";
@@ -34,33 +35,8 @@ public class SparqlHelper {
         String endYear = "";
         //random question type
         //int qType = randInt(0, 1); //randInt(min, max)
-        int qType = 0;
-        switch (qType) {
-            //start year of artist/band
-            case 0:
-                int rOffset = randInt(0, 100);
-                queryString =
-                        "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
-                                "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
-                                "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
-                                "\n" +
-                                "SELECT DISTINCT  ?artist ?dboStartYear ?dboEndYear\n" +
-                                "WHERE\n" +
-                                "  { ?artist <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> dbo:MusicalArtist .\n" +
-                                "    ?artist dbo:activeYearsStartYear ?dboStartYear\n" +
-                                "    OPTIONAL\n" +
-                                "      { ?artist dbo:activeYearsEndYear ?dboEndYear}\n" +
-                                "  }\n" +
-                               // "ORDER BY DESC(?dboStartYear)\n" +
-                                "OFFSET " + rOffset + "\n" +
-                                "LIMIT   1";
-                //queryString = "PREFIX dbo: <http://dbpedia.org/ontology/>\n" + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" + "PREFIX dbp: <http://dbpedia.org/property/>\n" + "PREFIX dct: <http://purl.org/dc/terms/>\n" + "PREFIX dbc: <http://dbpedia.org/resource/Category:>\n" + "\n" + "SELECT DISTINCT ?city_name ?sun\n" + "WHERE\n" + " { ?city dct:subject dbc:Capitals_in_Europe ;\n" + " rdfs:label ?city_name ;\n" + " dbp:yearSun ?sun\n" + " OPTIONAL\n" + " { ?city dbo:populationTotal ?population_total }\n" + " OPTIONAL\n" + " { ?city dbp:populationBlank ?population_blank }\n" + " FILTER ( ( ?population_total > 2000000 ) || ( ?population_blank > 2000000 ) )\n" + " FILTER langMatches(lang(?city_name), \"EN\")\n" + " }\n" + "LIMIT 10";
-                break;
-            //add more cases here for different question types
-           // case 1:
-            //...
-            //    break;
-        }
+        int qType = 0; //0:Carrer start of artist
+        queryString = qs.getQueryString(qType);
 
         Query query = QueryFactory.create(queryString);
         String service = "http://dbpedia.org/sparql";
@@ -95,6 +71,7 @@ public class SparqlHelper {
                     startYear = null;
                 } else if (sol.get("dboStartYear").isLiteral()) {
                     startYear = sol.getLiteral("dboStartYear").toString().substring(0, 4);
+                    int startYearInt = Integer.valueOf(startYear);
                 } else {
                     startYear = sol.getResource("dboStartYear").getURI();
                 }
@@ -142,9 +119,9 @@ public class SparqlHelper {
                 q.setOPTD("wrong option");
 
 
-               // System.out.println(resultsBuffer.toString());
+                // System.out.println(resultsBuffer.toString());
 
-        }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,13 +132,6 @@ public class SparqlHelper {
 
 
         return q;
-    }
-
-
-    public int randInt(int min, int max) {
-        Random rand = new Random();
-        int randomNum = rand.nextInt((max-min)+1) + min;
-        return randomNum;
     }
 
 }
