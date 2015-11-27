@@ -7,6 +7,7 @@ import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
     // min and max number of Questions
     public final int minQ = 1;
-    public final int maxQ = 5;
+    public final int maxQ = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,19 @@ public class MainActivity extends AppCompatActivity {
         //Get number of questions
         EditText editTextNumQuestions = (EditText) findViewById(R.id.editTextNumberOfQuestions);
         String numQuestionsString = editTextNumQuestions.getText().toString();
+
+        //Get difficulty
+        RadioButton radioButtonEasy = (RadioButton) findViewById(R.id.radioButtonEasy);
+        RadioButton radioButtonHard = (RadioButton) findViewById(R.id.radioButtonHard);
+
+        int difficulty = 0; //0 easy , 1 hard
+        if (radioButtonEasy.isChecked()) {
+            difficulty = 0;
+        } else if (radioButtonHard.isChecked()){
+            difficulty = 1;
+        }
+        intent.putExtra("DIFFICULTY", difficulty);
+
 
         //check if player name is entered correctly
         if(TextUtils.isEmpty(playerName)) {

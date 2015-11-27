@@ -18,6 +18,8 @@ public class QuizActivity extends AppCompatActivity {
     List<Question> quesList;
     int score=0;
     int qid=0;
+    int difficulty=0;
+    int numOfQuestions = 0;
     Question currentQ;
     TextView txtQuestion;
     Button bA, bB, bC, bD;
@@ -36,6 +38,12 @@ public class QuizActivity extends AppCompatActivity {
         //SparqlHelper class
 //        SparqlHelper sp = new SparqlHelper();
         //currentQ = sp.getNewQuestion();
+
+        Bundle extras = getIntent().getExtras();
+        difficulty = extras.getInt("DIFFICULTY");
+        numOfQuestions = extras.getInt("NUM_QUESTIONS");
+
+
         AsyncTask<Void, Void, Question> execute = new newQ().execute();
         try {
             currentQ = execute.get();
@@ -131,7 +139,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private  void checkQid() {
-        if (qid < 5) {
+        if (qid < numOfQuestions) {
             //currentQ = quesList.get(qid);
             AsyncTask<Void, Void, Question> execute = new newQ().execute();
             try {
@@ -190,7 +198,7 @@ public class QuizActivity extends AppCompatActivity {
 
         protected Question doInBackground(Void... params) {
             try {
-                Question nq = sp.getNewQuestion();
+                Question nq = sp.getNewQuestion(difficulty);
                 return nq;
             } catch (Exception e) {
                 this.exception = e;

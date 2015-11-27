@@ -9,6 +9,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 
+import java.util.Calendar;
 import java.util.Random;
 
 
@@ -24,7 +25,7 @@ public class SparqlHelper {
     private static final String KEY_OPTD = "optd"; //option d
     private static final String KEY_ANSWER = "answer"; //correct option
 
-    public Question getNewQuestion() {
+    public Question getNewQuestion(int diff) {
        // String[] q = new String[5]; //index: 0=question, 1=right answer, 1-4=answer choices
         Question q = new Question();
         QueryString qs = new QueryString();
@@ -35,6 +36,10 @@ public class SparqlHelper {
         String endYear = "";
         //random question type
         //int qType = randInt(0, 1); //randInt(min, max)
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+
+        int difficulty = diff;
         int qType = 0; //0:Carrer start of artist
         queryString = qs.getQueryString(qType);
 
@@ -65,37 +70,83 @@ public class SparqlHelper {
                 //get dboEndYear (if available)
                endYear = resultVariables.getEndYear(sol);
 
-               /* for (String var : columnNames) {
 
-//                String myArtist = sol.getLiteral("artist").getString();
-//                String myStartYear = sol.getLiteral("dboStartYear").getString();
-//                String myEndYear = sol.getLiteral("dboEndYear").getString();
+                q.setQUESTION("When did the musical career of " + artist + " start?");
+                q.setANSWER(startYear);
 
-                    resultsBuffer.append(var +": ");
+                RandomInt randomAnswer = new RandomInt();
+                int answerButton = randomAnswer.getRandInt(1, 4);
 
-                    // Data value will be null if optional and not present
-                    if (sol.get(var) == null) {
-                        resultsBuffer.append("{null}");
-                        // Test whether the returned value is a literal value
-                    } else if (sol.get(var).isLiteral()) {
-                        resultsBuffer.append(sol.getLiteral(var).toString());
-                        // Otherwise the returned value is a URI
-                    } else {
-                        resultsBuffer.append(sol.getResource(var).getURI());
+                boolean w1search = true;
+                boolean w2search = true;
+                boolean w3search = true;
+                String rightAnswer = "";
+                String wrongAnswer1 = "";
+                String wrongAnswer2 = "";
+                String wrongAnswer3 = "";
+                int wrongAnswerInt1 = 0;
+                int wrongAnswerInt2 = 0;
+                int wrongAnswerInt3 = 0;
+
+                //ger right answer
+                rightAnswer = startYear;
+
+                //get first wrong answer
+                while (w1search) {
+                    AnswerOptions w1 = new AnswerOptions();
+                    wrongAnswerInt1 = w1.getYearNumber(rightAnswer, difficulty);
+                    wrongAnswer1 = String.valueOf(wrongAnswerInt1);
+                    if (wrongAnswer1 != rightAnswer && wrongAnswerInt1 <= currentYear) {
+                        w1search = false;
                     }
-                    resultsBuffer.append('\n');
                 }
-                resultsBuffer.append("-----------------\n");
-*/
-                //System.out.println(sol.getLiteral("artist").getString());
 
-                q.setQUESTION("question placeholder with artist " + artist);
-                q.setANSWER("answer: " + startYear);
-                q.setOPTA("answer: " + startYear);
-                q.setOPTB("wrong option");
-                q.setOPTC("wrong option");
-                q.setOPTD("wrong option");
+                //get second wrong answer
+                while (w2search) {
+                    AnswerOptions w2 = new AnswerOptions();
+                    wrongAnswerInt2 = w2.getYearNumber(rightAnswer, difficulty);
+                    wrongAnswer2 = String.valueOf(wrongAnswerInt2);
+                    if (wrongAnswer2 != rightAnswer && wrongAnswer1 != wrongAnswer2 && wrongAnswerInt2 <= currentYear) {
+                        w2search = false;
+                    }
+                }
 
+                //get thrid wrong answer
+                while (w3search) {
+                    AnswerOptions w3 = new AnswerOptions();
+                    wrongAnswerInt3 = w3.getYearNumber(rightAnswer, difficulty);
+                    wrongAnswer3 = String.valueOf(wrongAnswerInt3);
+                    if (wrongAnswer3 != rightAnswer && wrongAnswer1 != wrongAnswer3 && wrongAnswer2 != wrongAnswer3 && wrongAnswerInt3 <= currentYear) {
+                        w3search = false;
+                    }
+                }
+
+                switch (answerButton) {
+                    case 1:
+                        q.setOPTA(rightAnswer);
+                        q.setOPTB(wrongAnswer1);
+                        q.setOPTC(wrongAnswer2);
+                        q.setOPTD(wrongAnswer3);
+                        break;
+                    case 2:
+                        q.setOPTA(wrongAnswer1);
+                        q.setOPTB(rightAnswer);
+                        q.setOPTC(wrongAnswer2);
+                        q.setOPTD(wrongAnswer3);
+                        break;
+                    case 3:
+                        q.setOPTA(wrongAnswer1);
+                        q.setOPTB(wrongAnswer2);
+                        q.setOPTC(rightAnswer);
+                        q.setOPTD(wrongAnswer3);
+                        break;
+                    case 4:
+                        q.setOPTA(wrongAnswer1);
+                        q.setOPTB(wrongAnswer2);
+                        q.setOPTC(wrongAnswer3);
+                        q.setOPTD(rightAnswer);
+                        break;
+                }
 
                 // System.out.println(resultsBuffer.toString());
 

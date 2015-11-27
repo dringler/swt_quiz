@@ -17,6 +17,12 @@ public class ResultVariables {
             artist = sol.getLiteral("artist").toString();
         } else {
             artist = sol.getResource("artist").getURI().substring(28);
+            int index = 0;
+            index = artist.indexOf("(");
+            if (index > 2) {
+                artist = artist.substring(0, index - 1);
+            }
+            artist = artist.replaceAll("_", " ");
         }
         System.out.println("artist: " + artist);
         return artist;
