@@ -74,9 +74,6 @@ public class SparqlHelper {
                 q.setQUESTION("When did the musical career of " + artist + " start?");
                 q.setANSWER(startYear);
 
-                RandomInt randomAnswer = new RandomInt();
-                int answerButton = randomAnswer.getRandInt(1, 4);
-
                 boolean w1search = true;
                 boolean w2search = true;
                 boolean w3search = true;
@@ -96,7 +93,8 @@ public class SparqlHelper {
                     AnswerOptions w1 = new AnswerOptions();
                     wrongAnswerInt1 = w1.getYearNumber(rightAnswer, difficulty);
                     wrongAnswer1 = String.valueOf(wrongAnswerInt1);
-                    if (wrongAnswer1 != rightAnswer && wrongAnswerInt1 <= currentYear) {
+                    if (!wrongAnswer1.equals(rightAnswer) &&
+                            wrongAnswerInt1 <= currentYear) {
                         w1search = false;
                     }
                 }
@@ -106,20 +104,28 @@ public class SparqlHelper {
                     AnswerOptions w2 = new AnswerOptions();
                     wrongAnswerInt2 = w2.getYearNumber(rightAnswer, difficulty);
                     wrongAnswer2 = String.valueOf(wrongAnswerInt2);
-                    if (wrongAnswer2 != rightAnswer && wrongAnswer1 != wrongAnswer2 && wrongAnswerInt2 <= currentYear) {
+                    if (!wrongAnswer2.equals(rightAnswer) &&
+                            !wrongAnswer2.equals(wrongAnswer1) &&
+                            wrongAnswerInt2 <= currentYear) {
                         w2search = false;
                     }
                 }
 
-                //get thrid wrong answer
+                //get third wrong answer
                 while (w3search) {
                     AnswerOptions w3 = new AnswerOptions();
                     wrongAnswerInt3 = w3.getYearNumber(rightAnswer, difficulty);
                     wrongAnswer3 = String.valueOf(wrongAnswerInt3);
-                    if (wrongAnswer3 != rightAnswer && wrongAnswer1 != wrongAnswer3 && wrongAnswer2 != wrongAnswer3 && wrongAnswerInt3 <= currentYear) {
+                    if (!wrongAnswer3.equals(rightAnswer) &&
+                            !wrongAnswer3.equals(wrongAnswer1) &&
+                            !wrongAnswer3.equals(wrongAnswer2) &&
+                            wrongAnswerInt3 <= currentYear) {
                         w3search = false;
                     }
                 }
+
+                RandomInt randomAnswer = new RandomInt();
+                int answerButton = randomAnswer.getRandInt(1, 4);
 
                 switch (answerButton) {
                     case 1:
