@@ -1,20 +1,68 @@
 package com.example.curtis.swt_quiz_app;
 
+import java.util.List;
 import java.util.Random;
 
 /**
  * Created by curtis on 26/11/15.
  */
 public class QueryString {
+    private String queryStringQ = ""; //query string that might have quotes
     private  String queryString = "";
 
-    public String getQueryString(int qType) {
+    public String getQueryString(int qType, int listNum, List<String> list) {
+        //get random index for artist
+        RandomInt randomA = new RandomInt();
+        int randomArtist = randomA.getRandInt(0, 10); //change maximum according to list size (top x)
+        String artist = list.get(randomArtist);
+
         switch (qType) {
-            //career start of artist/band
-            case 0:
+            case 0: //career start of artist/band
                 RandomInt randomInt = new RandomInt();
                 int rOffset = randomInt.getRandInt(0, 100);
-                queryString =
+
+                if (listNum == 0) { //bands
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "\n" +
+                                    "SELECT DISTINCT  ?artist ?dboStartYear\n" +
+                                    "WHERE\n" +
+                                    "  { ?artist <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> dbo:Band .\n" +
+                                    "    ?artist dbo:activeYearsStartYear ?dboStartYear .\n" +
+                                    "FILTER\n" +
+                                    "(?artist = <" + artist + ">) .\n" +
+                                    "  }\n";
+
+                                    // "ORDER BY DESC(?dboStartYear)\n" +
+//                                    "OFFSET " + rOffset + "\n" +
+//                                    "LIMIT   1";
+                    queryString = removeQuotation(queryStringQ);
+
+                } else { //musicians
+
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "\n" +
+                                    "SELECT DISTINCT  ?artist ?dboStartYear\n" +
+                                    "WHERE\n" +
+                                    "  { ?artist <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> dbo:MusicalArtist .\n" +
+                                    "    ?artist dbo:activeYearsStartYear ?dboStartYear .\n" +
+                                    "FILTER\n" +
+                                    "(?artist = <" + artist +">) .\n" +
+                                    "  }\n";
+//                                    // "ORDER BY DESC(?dboStartYear)\n" +
+//                                    "OFFSET " + rOffset + "\n" +
+//                                    "LIMIT   1";
+                    queryString = removeQuotation(queryStringQ);
+                }
+                break;
+            //add more cases here for different question types
+            case 1:
+                queryStringQ =
                         "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
                                 "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
                                 "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
@@ -26,17 +74,20 @@ public class QueryString {
                                 "    OPTIONAL\n" +
                                 "      { ?artist dbo:activeYearsEndYear ?dboEndYear} .\n" +
                                 "FILTER\n" +
-                                "(?dboStartYear > 1970-01-01) .\n"+
+                                "(?dboStartYear > 1970-01-01) .\n" +
                                 "  }\n" +
                                 // "ORDER BY DESC(?dboStartYear)\n" +
-                                "OFFSET " + rOffset + "\n" +
+//                                "OFFSET " + rOffset + "\n" +
                                 "LIMIT   1";
+                queryString = removeQuotation(queryStringQ);
 
-                break;
-            //add more cases here for different question types
-            case 1:
                 break;
         }
         return queryString;
+    }
+    private static String removeQuotation(String quoted) {
+        String unquoted;
+        unquoted = quoted.replace("\"", "");
+        return unquoted;
     }
 }

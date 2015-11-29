@@ -20,6 +20,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class QuizActivity extends AppCompatActivity {
@@ -32,6 +33,10 @@ public class QuizActivity extends AppCompatActivity {
     Question currentQ;
     TextView txtQuestion;
     Button bA, bB, bC, bD;
+    List<String> bands = new ArrayList<String>();
+    List<String> inactiveBands = new ArrayList<String>();
+    List<String> musicians = new ArrayList<String>();
+    List<String> inactiveMusicians = new ArrayList<String>();
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -59,7 +64,11 @@ public class QuizActivity extends AppCompatActivity {
         numOfQuestions = extras.getInt("NUM_QUESTIONS");
 
         CsvParserClass csvParser = new CsvParserClass();
-        csvParser.getCSV("res/raw/active_bands_1000.csv");
+
+        bands = csvParser.getCSV("bands_10.csv");
+        inactiveBands = csvParser.getCSV("inactive_bands_10.csv");
+        musicians = csvParser.getCSV("musicians_10.csv");
+        inactiveMusicians = csvParser.getCSV("inactive_musicians_10.csv");
 
 
         AsyncTask<Void, Void, Question> execute = new NewQ().execute();
@@ -176,22 +185,11 @@ public class QuizActivity extends AppCompatActivity {
             String playerName = extras.getString("PLAYER_NAME");
             int numQuestions = extras.getInt("NUM_QUESTIONS");
 
-//            extras.putInt("score", score); //Your score
-//            getIntent().putExtras(extras); //Put your score to your next Intent
-
             Intent intent = new Intent(this, ResultActivity.class);
             intent.putExtra("score", score);
             intent.putExtra("PLAYER_NAME", playerName);
             intent.putExtra("NUM_QUESTIONS", numQuestions);
             startActivity(intent);
-
-//
-//            Intent mIntent = new Intent(this, ResultActivity.class);
-//            Bundle mBundle = new Bundle();
-//            mBundle.putInt("score", score);
-//            mIntent.putExtras(mBundle);
-//            startActivity(mIntent);
-
 
             finish();
         }
@@ -210,9 +208,51 @@ public class QuizActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-
     }
 
+    private class NewQ extends AsyncTask<Void, Void, Question> {
+        SparqlHelper sp = new SparqlHelper();
+        private Exception exception;
+
+        protected Question doInBackground(Void... params) {
+            try {
+                Question nq = sp.getNewQuestion(difficulty, bands, inactiveBands, musicians, inactiveMusicians);
+                return nq;
+            } catch (Exception e) {
+                this.exception = e;
+                return null;
+            }
+        }
+    }
+
+    private class CsvParserClass {
+        private List<String> getCSV(String filepath) {
+            List<String> returnList = new ArrayList<String>();
+
+            InputStreamReader is = null;
+            try {
+                is = new InputStreamReader(getAssets()
+                        .open(filepath));
+
+                BufferedReader reader = new BufferedReader(is);
+                reader.readLine();
+                String data;
+                while ((data = reader.readLine()) != null) {
+                    String[] line = data.split(",");
+                    if (line.length > 1) {
+                        returnList.add(line[0]);
+                        String artist = line[0];
+                        String rank = line[1];
+                        Log.d("csv output", "added artist: " + artist + " with rank: " + rank + " to ArrayList");
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        return returnList;
+        }
+
+    }
     @Override
     public void onStart() {
         super.onStart();
@@ -251,48 +291,6 @@ public class QuizActivity extends AppCompatActivity {
         );
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
-    }
-
-    private class NewQ extends AsyncTask<Void, Void, Question> {
-        SparqlHelper sp = new SparqlHelper();
-        private Exception exception;
-
-        protected Question doInBackground(Void... params) {
-            try {
-                Question nq = sp.getNewQuestion(difficulty);
-                return nq;
-            } catch (Exception e) {
-                this.exception = e;
-                return null;
-            }
-        }
-    }
-
-    private class CsvParserClass {
-        private void getCSV(String filepath) {
-
-            InputStreamReader is = null;
-            try {
-                is = new InputStreamReader(getAssets()
-                        .open("active_bands_10.csv"));
-
-                BufferedReader reader = new BufferedReader(is);
-                reader.readLine();
-                String data;
-                while ((data = reader.readLine()) != null) {
-                    String[] line = data.split(","); // Splits the line up into a string array
-                    if (line.length > 1) {
-                        // Do stuff, e.g:
-                        String band = line[0];
-                        String rank = line[1];
-                        Log.d("csv output", "band: " + band + " with rank: " + rank);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
 
