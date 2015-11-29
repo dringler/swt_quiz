@@ -118,7 +118,7 @@ public class SparqlHelper {
                         //get dboStartYear
                         startYear = resultVariables.getStartYear(sol);
 
-                        q.setQUESTION("When did the musical career of " + artist + " start?");
+                        q.setQUESTION("When did the musical career of \n" + artist + " start?");
                         q.setANSWER(startYear);
 
                         //ger right answer
