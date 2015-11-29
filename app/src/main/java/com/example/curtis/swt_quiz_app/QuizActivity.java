@@ -1,6 +1,7 @@
 package com.example.curtis.swt_quiz_app;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,19 +12,33 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
+
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 public class QuizActivity extends AppCompatActivity {
 
     List<Question> quesList;
-    int score=0;
-    int qid=0;
-    int difficulty=0;
+    int score = 0;
+    int qid = 0;
+    int difficulty = 0;
     int numOfQuestions = 0;
     Question currentQ;
     TextView txtQuestion;
     Button bA, bB, bC, bD;
-//    RadioButton rda, rdb, rdc;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
+    //    RadioButton rda, rdb, rdc;
 //    Button butNext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,19 +58,22 @@ public class QuizActivity extends AppCompatActivity {
         difficulty = extras.getInt("DIFFICULTY");
         numOfQuestions = extras.getInt("NUM_QUESTIONS");
 
+        CsvParserClass csvParser = new CsvParserClass();
+        csvParser.getCSV("res/raw/active_bands_1000.csv");
 
-        AsyncTask<Void, Void, Question> execute = new newQ().execute();
+
+        AsyncTask<Void, Void, Question> execute = new NewQ().execute();
         try {
             currentQ = execute.get();
         } catch (Exception e) {
             System.out.println(e);
         }
 
-        txtQuestion=(TextView)findViewById(R.id.textViewQuestion);
-        bA=(Button)findViewById(R.id.buttonAnswer1);
-        bB=(Button)findViewById(R.id.buttonAnswer2);
-        bC=(Button)findViewById(R.id.buttonAnswer3);
-        bD=(Button)findViewById(R.id.buttonAnswer4);
+        txtQuestion = (TextView) findViewById(R.id.textViewQuestion);
+        bA = (Button) findViewById(R.id.buttonAnswer1);
+        bB = (Button) findViewById(R.id.buttonAnswer2);
+        bC = (Button) findViewById(R.id.buttonAnswer3);
+        bD = (Button) findViewById(R.id.buttonAnswer4);
 
         setQuestionView();
 
@@ -115,6 +133,9 @@ public class QuizActivity extends AppCompatActivity {
                 checkQid();
             }
         });
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
@@ -127,21 +148,22 @@ public class QuizActivity extends AppCompatActivity {
         Toast toastA = Toast.makeText(getApplicationContext(), "Correct! =)",
                 Toast.LENGTH_SHORT);
         TextView va = (TextView) toastA.getView().findViewById(android.R.id.message);
-        if( va != null) va.setGravity(Gravity.CENTER);
+        if (va != null) va.setGravity(Gravity.CENTER);
         toastA.show();
     }
+
     private void wrongA() {
-        Toast toastW = Toast.makeText(getApplicationContext(), "Wrong! =(\n" +currentQ.getANSWER() + " is the correct answer.",
+        Toast toastW = Toast.makeText(getApplicationContext(), "Wrong! =(\n" + currentQ.getANSWER() + " is the correct answer.",
                 Toast.LENGTH_SHORT);
         TextView vw = (TextView) toastW.getView().findViewById(android.R.id.message);
-        if( vw != null) vw.setGravity(Gravity.CENTER);
+        if (vw != null) vw.setGravity(Gravity.CENTER);
         toastW.show();
     }
 
-    private  void checkQid() {
+    private void checkQid() {
         if (qid < numOfQuestions) {
             //currentQ = quesList.get(qid);
-            AsyncTask<Void, Void, Question> execute = new newQ().execute();
+            AsyncTask<Void, Void, Question> execute = new NewQ().execute();
             try {
                 currentQ = execute.get();
             } catch (Exception e) {
@@ -171,12 +193,11 @@ public class QuizActivity extends AppCompatActivity {
 //            startActivity(mIntent);
 
 
-
             finish();
         }
     }
-    private void setQuestionView()
-    {
+
+    private void setQuestionView() {
         txtQuestion.setText(currentQ.getQUESTION());
         bA.setText(currentQ.getOPTA());
         bB.setText(currentQ.getOPTB());
@@ -192,7 +213,47 @@ public class QuizActivity extends AppCompatActivity {
 
     }
 
-    private class newQ extends AsyncTask<Void, Void, Question> {
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Quiz Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.example.curtis.swt_quiz_app/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Quiz Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.example.curtis.swt_quiz_app/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
+
+    private class NewQ extends AsyncTask<Void, Void, Question> {
         SparqlHelper sp = new SparqlHelper();
         private Exception exception;
 
@@ -206,5 +267,33 @@ public class QuizActivity extends AppCompatActivity {
             }
         }
     }
+
+    private class CsvParserClass {
+        private void getCSV(String filepath) {
+
+            InputStreamReader is = null;
+            try {
+                is = new InputStreamReader(getAssets()
+                        .open("active_bands_10.csv"));
+
+                BufferedReader reader = new BufferedReader(is);
+                reader.readLine();
+                String data;
+                while ((data = reader.readLine()) != null) {
+                    String[] line = data.split(","); // Splits the line up into a string array
+                    if (line.length > 1) {
+                        // Do stuff, e.g:
+                        String band = line[0];
+                        String rank = line[1];
+                        Log.d("csv output", "band: " + band + " with rank: " + rank);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
 
 }
