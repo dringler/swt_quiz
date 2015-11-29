@@ -141,6 +141,7 @@ public class QueryString {
                                     "WHERE {\n" +
                                     "?artist a dbo:Band .\n" +
                                     "?albumname dbo:artist ?artist .\n" +
+                                    "?albumname a dbo:Album .\n" +
                                     "FILTER (?artist = <" + artist + "> || " +
                                     "?artist = <" + artist2 + "> || " +
                                     "?artist = <" + artist3 + "> || " +
@@ -156,6 +157,7 @@ public class QueryString {
                                     "WHERE {\n" +
                                     "?artist a dbo:MusicalArtist .\n" +
                                     "?albumname dbo:artist ?artist .\n" +
+                                    "?albumname a dbo:Album .\n" +
                                     "FILTER (?artist = <" + artist + "> || " +
                                     "?artist = <" + artist2 + "> || " +
                                     "?artist = <" + artist3 + "> || " +
