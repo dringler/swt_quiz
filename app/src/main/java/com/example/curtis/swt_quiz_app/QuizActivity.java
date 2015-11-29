@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -69,21 +70,13 @@ public class QuizActivity extends AppCompatActivity {
         musicians = csvParser.getCSV("musicians_10.csv");
         inactiveMusicians = csvParser.getCSV("inactive_musicians_10.csv");
 
-
-        AsyncTask<Void, Void, Question> execute = new NewQ().execute();
-        try {
-            currentQ = execute.get();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-
         txtQuestion = (TextView) findViewById(R.id.textViewQuestion);
         bA = (Button) findViewById(R.id.buttonAnswer1);
         bB = (Button) findViewById(R.id.buttonAnswer2);
         bC = (Button) findViewById(R.id.buttonAnswer3);
         bD = (Button) findViewById(R.id.buttonAnswer4);
 
-        setQuestionView();
+        getNewQuestion();
 
         bA.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,14 +163,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private void checkQid() {
         if (qid < numOfQuestions) {
-            //currentQ = quesList.get(qid);
-            AsyncTask<Void, Void, Question> execute = new NewQ().execute();
-            try {
-                currentQ = execute.get();
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-            setQuestionView();
+            getNewQuestion();
         } else {
 
             Bundle extras = getIntent().getExtras();
@@ -213,18 +199,38 @@ public class QuizActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void getNewQuestion() {
+        try {
+            AsyncTask<Void, Void, Question> execute = new NewQ().execute();
+            currentQ = execute.get();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
     private class NewQ extends AsyncTask<Void, Void, Question> {
         SparqlHelper sp = new SparqlHelper();
         private Exception exception;
 
         protected Question doInBackground(Void... params) {
-            try {
-                Question nq = sp.getNewQuestion(difficulty, bands, inactiveBands, musicians, inactiveMusicians);
-                return nq;
-            } catch (Exception e) {
-                this.exception = e;
-                return null;
+            boolean trying = true;
+            Question nq = new Question();
+            while (trying) {
+                try {
+                    nq = sp.getNewQuestion(difficulty, bands, inactiveBands, musicians, inactiveMusicians);
+                    trying = false;
+//                    return nq;
+                } catch (Exception e) {
+                    this.exception = e;
+//                    return null;
+                }
             }
+            return nq;
+        }
+
+        @Override
+        protected void onPostExecute(Question question) {
+            super.onPostExecute(question);
+            setQuestionView();
         }
     }
 
