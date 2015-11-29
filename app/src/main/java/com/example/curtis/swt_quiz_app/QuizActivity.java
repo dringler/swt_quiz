@@ -16,7 +16,6 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -196,12 +195,16 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void setQuestionView() {
-        txtQuestion.setText(currentQ.getQUESTION());
-        bA.setText(currentQ.getOPTA());
-        bB.setText(currentQ.getOPTB());
-        bC.setText(currentQ.getOPTC());
-        bD.setText(currentQ.getOPTD());
-        qid++;
+        try {
+            txtQuestion.setText(currentQ.getQUESTION());
+            bA.setText(currentQ.getOPTA());
+            bB.setText(currentQ.getOPTB());
+            bC.setText(currentQ.getOPTC());
+            bD.setText(currentQ.getOPTD());
+            qid++;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void backMain(View view) {
