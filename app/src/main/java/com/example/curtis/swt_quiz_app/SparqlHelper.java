@@ -28,29 +28,34 @@ public class SparqlHelper {
     private static final String KEY_OPTD = "optd"; //option d
     private static final String KEY_ANSWER = "answer"; //correct option
 
-    public Question getNewQuestion(int diff,  List<String> b,  List<String> iB,  List<String> m,  List<String> iM) {
+    public Question getNewQuestion(int diff,  List<String> b,  List<String> iB, List<String> aB, List<String> m,  List<String> iM, List<String> aM) {
 
         int difficulty = diff;
         List<String> bands = b;
         List<String> inactiveBands = iB;
+        List<String> allBands = aB;
         List<String> musicians = m;
         List<String> inactiveMusicians = iM;
+        List<String> allMusicians = aM;
+
 
         int qType = 0; //question type
         int listNum = 0; //band/artist identifier, 0:band, 1:musicalArtist
-
+        int resultCounter = 0; //counts the number of result of the query
 
         String queryString = "";
         String artist = "";
         String startYear = "";
         String endYear = "";
+        String hometown = "";
+        String albumname = "";
 
         Question q = new Question();
         QueryString qs = new QueryString();
 
         //random question type
         RandomInt randomIntQ = new RandomInt();
-        qType = randomIntQ.getRandInt(0, 1); //randInt(min, max)
+        qType = randomIntQ.getRandInt(0, 3); //randInt(min, max)
 
         RandomInt randomIntL = new RandomInt();
         switch (qType) {
@@ -70,6 +75,22 @@ public class SparqlHelper {
                     queryString = qs.getQueryString(qType, listNum, inactiveMusicians);
                 }
                 break;
+            case 2: //2:hometown of artist/band
+                listNum = randomIntL.getRandInt(0, 1);
+                if (listNum == 0) { //band
+                    queryString = qs.getQueryString(qType, listNum, allBands);
+                } else { //musician
+                    queryString = qs.getQueryString(qType, listNum, allMusicians);
+                }
+                break;
+            case 3: //3:which album is from the following artist/band
+                listNum = randomIntL.getRandInt(0, 1);
+                if (listNum == 0) { //band
+                    queryString = qs.getQueryString(qType, listNum, allBands);
+                } else { //musician
+                    queryString = qs.getQueryString(qType, listNum, allMusicians);
+                }
+                break;
         }
 
 
@@ -85,17 +106,18 @@ public class SparqlHelper {
             System.out.println(ResultSetFormatter.asText(output));
             //ResultSetFormatter.out(System.out, output);
 
+            List<String> seenArtist = new ArrayList<String>();
 
+            String rightAnswer = "";
+            String wrongAnswer1 = "";
+            String wrongAnswer2 = "";
+            String wrongAnswer3 = "";
+
+            nextResultLoop:
             while (results.hasNext()) {
                 QuerySolution sol = results.next();
                 ResultVariables resultVariables = new ResultVariables();
                 List<String> wrongAnswers = new ArrayList<String>();
-
-                String rightAnswer = "";
-                String wrongAnswer1 = "";
-                String wrongAnswer2 = "";
-                String wrongAnswer3 = "";
-
 
                 switch (qType) {
 
@@ -135,39 +157,121 @@ public class SparqlHelper {
                         wrongAnswer1 = wrongAnswers.get(0);
                         wrongAnswer2 = wrongAnswers.get(1);
                         wrongAnswer3 = wrongAnswers.get(2);
-                }
+                        break;
+                    case 2: //2:hometown of artist/band
+                        switch (resultCounter) {
+                            case 0:
+                                artist = resultVariables.getArtist(sol);
+                                hometown = resultVariables.getHometown(sol);
+                                q.setQUESTION("Where is " + artist + " from?");
+                                q.setANSWER(hometown);
+                                rightAnswer = hometown;
+                                seenArtist.add(artist);
+                                resultCounter++;
+                                break;
+                            case 1:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer1 = resultVariables.getHometown(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                    resultCounter++;
+                                }
+                                break;
+                            case 2:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer2 = resultVariables.getHometown(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                    resultCounter++;
+                                }
+                                break;
+                            case 3:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer3 = resultVariables.getHometown(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                    resultCounter++;
+                                }
+                                break;
+                            default:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer3 = resultVariables.getHometown(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                }
+                                break;
+                        }
+                        continue nextResultLoop;
+                    case 3: //3:which album is from the following artist/band
+                        switch (resultCounter) {
+                            case 0:
+                                artist = resultVariables.getArtist(sol);
+                                albumname = resultVariables.getAlbumname(sol);
+                                q.setQUESTION("Which album was released by \n" + artist + "?");
+                                q.setANSWER(albumname);
+                                rightAnswer = albumname;
+                                seenArtist.add(artist);
+                                resultCounter++;
+                                break;
+                            case 1:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer1 = resultVariables.getAlbumname(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                    resultCounter++;
+                                }
+                                break;
+                            case 2:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer2 = resultVariables.getAlbumname(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                    resultCounter++;
+                                }
+                                break;
+                            case 3:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer3 = resultVariables.getAlbumname(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                    resultCounter++;
+                                }
+                                break;
+                            default:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer3 = resultVariables.getAlbumname(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                }
+                                break;
+                        }
+                        continue nextResultLoop;
 
-                RandomInt randomAnswer = new RandomInt();
-                int answerButton = randomAnswer.getRandInt(1, 4);
 
-                switch (answerButton) {
-                    case 1:
-                        q.setOPTA(rightAnswer);
-                        q.setOPTB(wrongAnswer1);
-                        q.setOPTC(wrongAnswer2);
-                        q.setOPTD(wrongAnswer3);
-                        break;
-                    case 2:
-                        q.setOPTA(wrongAnswer1);
-                        q.setOPTB(rightAnswer);
-                        q.setOPTC(wrongAnswer2);
-                        q.setOPTD(wrongAnswer3);
-                        break;
-                    case 3:
-                        q.setOPTA(wrongAnswer1);
-                        q.setOPTB(wrongAnswer2);
-                        q.setOPTC(rightAnswer);
-                        q.setOPTD(wrongAnswer3);
-                        break;
-                    case 4:
-                        q.setOPTA(wrongAnswer1);
-                        q.setOPTB(wrongAnswer2);
-                        q.setOPTC(wrongAnswer3);
-                        q.setOPTD(rightAnswer);
-                        break;
                 }
             }
 
+            RandomInt randomAnswer = new RandomInt();
+            int answerButton = randomAnswer.getRandInt(1, 4);
+
+            switch (answerButton) {
+                case 1:
+                    q.setOPTA(rightAnswer);
+                    q.setOPTB(wrongAnswer1);
+                    q.setOPTC(wrongAnswer2);
+                    q.setOPTD(wrongAnswer3);
+                    break;
+                case 2:
+                    q.setOPTA(wrongAnswer1);
+                    q.setOPTB(rightAnswer);
+                    q.setOPTC(wrongAnswer2);
+                    q.setOPTD(wrongAnswer3);
+                    break;
+                case 3:
+                    q.setOPTA(wrongAnswer1);
+                    q.setOPTB(wrongAnswer2);
+                    q.setOPTC(rightAnswer);
+                    q.setOPTD(wrongAnswer3);
+                    break;
+                case 4:
+                    q.setOPTA(wrongAnswer1);
+                    q.setOPTB(wrongAnswer2);
+                    q.setOPTC(wrongAnswer3);
+                    q.setOPTD(rightAnswer);
+                    break;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

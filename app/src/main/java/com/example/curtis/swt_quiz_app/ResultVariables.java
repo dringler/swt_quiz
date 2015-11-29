@@ -9,6 +9,8 @@ public class ResultVariables {
     String artist = "";
     String startYear = "";
     String endYear = "";
+    String hometown = "";
+    String albumname ="";
 
     public String getArtist(QuerySolution sol) {
         if (sol.get("artist") == null) {
@@ -51,5 +53,41 @@ public class ResultVariables {
         }
         System.out.println("endYear: " + endYear);
         return endYear;
+    }
+
+    public String getHometown(QuerySolution sol) {
+        if (sol.get("hometown") == null) {
+            hometown = null;
+        } else if (sol.get("hometown").isLiteral()) {
+            hometown = sol.getLiteral("hometown").toString();
+        } else {
+            hometown = sol.getResource("hometown").getURI().substring(28);
+            int index = 0;
+            index = hometown.indexOf("(");
+            if (index > 2) {
+                hometown = hometown.substring(0, index - 1);
+            }
+            hometown = hometown.replaceAll("_", " ");
+        }
+        System.out.println("hometown: " + hometown);
+        return hometown;
+    }
+
+    public String getAlbumname(QuerySolution sol) {
+        if (sol.get("albumname") == null) {
+            albumname = null;
+        } else if (sol.get("albumname").isLiteral()) {
+            albumname = sol.getLiteral("albumname").toString();
+        } else {
+            albumname = sol.getResource("albumname").getURI().substring(28);
+            int index = 0;
+            index = albumname.indexOf("(");
+            if (index > 2) {
+                albumname = albumname.substring(0, index - 1);
+            }
+            albumname = albumname.replaceAll("_", " ");
+        }
+        System.out.println("albumname: " + albumname);
+        return albumname;
     }
 }

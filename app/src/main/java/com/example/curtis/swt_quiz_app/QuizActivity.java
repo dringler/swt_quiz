@@ -35,8 +35,10 @@ public class QuizActivity extends AppCompatActivity {
     Button bA, bB, bC, bD;
     List<String> bands = new ArrayList<String>();
     List<String> inactiveBands = new ArrayList<String>();
+    List<String> allBands = new ArrayList<String>();
     List<String> musicians = new ArrayList<String>();
     List<String> inactiveMusicians = new ArrayList<String>();
+    List<String> allMusicians = new ArrayList<String>();
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -56,10 +58,32 @@ public class QuizActivity extends AppCompatActivity {
 
         CsvParserClass csvParser = new CsvParserClass();
 
-        bands = csvParser.getCSV("bands_10.csv");
-        inactiveBands = csvParser.getCSV("inactive_bands_10.csv");
-        musicians = csvParser.getCSV("musicians_10.csv");
-        inactiveMusicians = csvParser.getCSV("inactive_musicians_10.csv");
+        bands = csvParser.getCSV("bands_top10.csv");
+        inactiveBands = csvParser.getCSV("inactive_bands_top10.csv");
+        musicians = csvParser.getCSV("musicians_top10.csv");
+        inactiveMusicians = csvParser.getCSV("inactive_musicians_top10.csv");
+
+        //List for all bands (active and inactive)
+        //add all bands
+        allBands.addAll(bands);
+        //add all inactive bands if not already included
+        for (int i = 0; i < inactiveBands.size(); i++) {
+            String bandName = inactiveBands.get(i);
+            if (!allBands.contains(bandName)) {
+                allBands.add(bandName);
+            }
+        }
+
+        //List for all musicians
+        //add all musicians
+        allMusicians.addAll(musicians);
+        //add all inactive musicians if not already included
+        for (int i = 0; i < inactiveMusicians.size(); i++) {
+            String artistName = inactiveMusicians.get(i);
+            if (!allMusicians.contains(artistName)) {
+                allMusicians.add(artistName);
+            }
+        }
 
         txtQuestion = (TextView) findViewById(R.id.textViewQuestion);
         bA = (Button) findViewById(R.id.buttonAnswer1);
@@ -207,7 +231,7 @@ public class QuizActivity extends AppCompatActivity {
             Question nq = new Question();
             while (trying) {
                 try {
-                    nq = sp.getNewQuestion(difficulty, bands, inactiveBands, musicians, inactiveMusicians);
+                    nq = sp.getNewQuestion(difficulty, bands, inactiveBands, allBands, musicians, inactiveMusicians, allMusicians);
                     trying = false;
 //                    return nq;
                 } catch (Exception e) {
