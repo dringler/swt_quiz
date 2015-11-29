@@ -9,6 +9,8 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
@@ -37,9 +39,6 @@ public class SparqlHelper {
         int qType = 0; //question type
         int listNum = 0; //band/artist identifier, 0:band, 1:musicalArtist
 
-        //get current year
-        Calendar calendar = Calendar.getInstance();
-        int currentYear = calendar.get(Calendar.YEAR);
 
         String queryString = "";
         String artist = "";
@@ -51,7 +50,7 @@ public class SparqlHelper {
 
         //random question type
         RandomInt randomIntQ = new RandomInt();
-        qType = randomIntQ.getRandInt(0, 0); //randInt(min, max)
+        qType = randomIntQ.getRandInt(0, 1); //randInt(min, max)
 
         RandomInt randomIntL = new RandomInt();
         switch (qType) {
@@ -75,43 +74,32 @@ public class SparqlHelper {
 
 
 
-
         Query query = QueryFactory.create(queryString);
         String service = "http://dbpedia.org/sparql";
         QueryExecution qexec = QueryExecutionFactory.sparqlService(service, query);
 
         try {
 
-            //ResultSet results = ResultSetFactory.copyResults(qexec.execSelect());
             ResultSet results = qexec.execSelect();
             ResultSet output = ResultSetFactory.copyResults(qexec.execSelect());
             System.out.println(ResultSetFormatter.asText(output));
             //ResultSetFormatter.out(System.out, output);
-            //StringBuffer resultsBuffer = new StringBuffer();
 
-            //List<String> columnNames = results.getResultVars();
 
             while (results.hasNext()) {
                 QuerySolution sol = results.next();
                 ResultVariables resultVariables = new ResultVariables();
+                List<String> wrongAnswers = new ArrayList<String>();
 
-                //get dboEndYear (if available)
-               endYear = resultVariables.getEndYear(sol);
-
-                boolean w1search = true;
-                boolean w2search = true;
-                boolean w3search = true;
                 String rightAnswer = "";
                 String wrongAnswer1 = "";
                 String wrongAnswer2 = "";
                 String wrongAnswer3 = "";
-                int wrongAnswerInt1 = 0;
-                int wrongAnswerInt2 = 0;
-                int wrongAnswerInt3 = 0;
+
 
                 switch (qType) {
 
-                    case 0: //0:Carrer start of artist/band
+                    case 0: //0:Career start of artist/band
                         //get artist
                         artist = resultVariables.getArtist(sol);
 
@@ -124,42 +112,29 @@ public class SparqlHelper {
                         //ger right answer
                         rightAnswer = startYear;
 
-                        //get first wrong answer
-                        while (w1search) {
-                            AnswerOptions w1 = new AnswerOptions();
-                            wrongAnswerInt1 = w1.getYearNumber(rightAnswer, difficulty);
-                            wrongAnswer1 = String.valueOf(wrongAnswerInt1);
-                            if (!wrongAnswer1.equals(rightAnswer) &&
-                                    wrongAnswerInt1 <= currentYear) {
-                                w1search = false;
-                            }
-                        }
+                        wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                        wrongAnswer1 = wrongAnswers.get(0);
+                        wrongAnswer2 = wrongAnswers.get(1);
+                        wrongAnswer3 = wrongAnswers.get(2);
 
-                        //get second wrong answer
-                        while (w2search) {
-                            AnswerOptions w2 = new AnswerOptions();
-                            wrongAnswerInt2 = w2.getYearNumber(rightAnswer, difficulty);
-                            wrongAnswer2 = String.valueOf(wrongAnswerInt2);
-                            if (!wrongAnswer2.equals(rightAnswer) &&
-                                    !wrongAnswer2.equals(wrongAnswer1) &&
-                                    wrongAnswerInt2 <= currentYear) {
-                                w2search = false;
-                            }
-                        }
-
-                        //get third wrong answer
-                        while (w3search) {
-                            AnswerOptions w3 = new AnswerOptions();
-                            wrongAnswerInt3 = w3.getYearNumber(rightAnswer, difficulty);
-                            wrongAnswer3 = String.valueOf(wrongAnswerInt3);
-                            if (!wrongAnswer3.equals(rightAnswer) &&
-                                    !wrongAnswer3.equals(wrongAnswer1) &&
-                                    !wrongAnswer3.equals(wrongAnswer2) &&
-                                    wrongAnswerInt3 <= currentYear) {
-                                w3search = false;
-                            }
-                        }
                         break;
+                    case 1: //0:Career end of artist/band
+                        //get artist
+                        artist = resultVariables.getArtist(sol);
+
+                        //get dboEndYear (if available)
+                        endYear = resultVariables.getEndYear(sol);
+
+                        q.setQUESTION("When did the musical career of \n" + artist + " end?");
+                        q.setANSWER(endYear);
+
+                        //ger right answer
+                        rightAnswer = endYear;
+
+                        wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                        wrongAnswer1 = wrongAnswers.get(0);
+                        wrongAnswer2 = wrongAnswers.get(1);
+                        wrongAnswer3 = wrongAnswers.get(2);
                 }
 
                 RandomInt randomAnswer = new RandomInt();
@@ -199,6 +174,68 @@ public class SparqlHelper {
         qexec.close();
 
         return q;
+    }
+
+    private List<String> getWrongAnswerOptionsYear(String rA, int difficulty) {
+
+        String rightAnswer = rA;
+
+        //get current year
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+
+        //store the results
+        List<String> result = new ArrayList<String>();
+
+        boolean w1search = true;
+        boolean w2search = true;
+        boolean w3search = true;
+        String wrongAnswer1 = "";
+        String wrongAnswer2 = "";
+        String wrongAnswer3 = "";
+        int wrongAnswerInt1 = 0;
+        int wrongAnswerInt2 = 0;
+        int wrongAnswerInt3 = 0;
+
+        //get first wrong answer
+        while (w1search) {
+            AnswerOptions w1 = new AnswerOptions();
+            wrongAnswerInt1 = w1.getYearNumber(rightAnswer, difficulty);
+            wrongAnswer1 = String.valueOf(wrongAnswerInt1);
+            if (!wrongAnswer1.equals(rightAnswer) &&
+                    wrongAnswerInt1 <= currentYear) {
+                result.add(wrongAnswer1);
+                w1search = false;
+            }
+        }
+
+        //get second wrong answer
+        while (w2search) {
+            AnswerOptions w2 = new AnswerOptions();
+            wrongAnswerInt2 = w2.getYearNumber(rightAnswer, difficulty);
+            wrongAnswer2 = String.valueOf(wrongAnswerInt2);
+            if (!wrongAnswer2.equals(rightAnswer) &&
+                    !wrongAnswer2.equals(wrongAnswer1) &&
+                    wrongAnswerInt2 <= currentYear) {
+                result.add(wrongAnswer2);
+                w2search = false;
+            }
+        }
+
+        //get third wrong answer
+        while (w3search) {
+            AnswerOptions w3 = new AnswerOptions();
+            wrongAnswerInt3 = w3.getYearNumber(rightAnswer, difficulty);
+            wrongAnswer3 = String.valueOf(wrongAnswerInt3);
+            if (!wrongAnswer3.equals(rightAnswer) &&
+                    !wrongAnswer3.equals(wrongAnswer1) &&
+                    !wrongAnswer3.equals(wrongAnswer2) &&
+                    wrongAnswerInt3 <= currentYear) {
+                result.add(wrongAnswer3);
+                w3search = false;
+            }
+        }
+        return result;
     }
 
 }

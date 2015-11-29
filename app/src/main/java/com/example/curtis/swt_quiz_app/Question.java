@@ -6,8 +6,6 @@ package com.example.curtis.swt_quiz_app;
 public class Question {
     private int ID;
     private String QUESTION;
-
-
     private String OPTA;
     private String OPTB;
     private String OPTC;

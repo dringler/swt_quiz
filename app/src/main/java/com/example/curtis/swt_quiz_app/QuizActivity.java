@@ -50,15 +50,6 @@ public class QuizActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
-        //DB class
-//        DbHelper db=new DbHelper(this);
-//        quesList=db.getAllQuestions();
-//        currentQ=quesList.get(qid);
-
-        //SparqlHelper class
-//        SparqlHelper sp = new SparqlHelper();
-        //currentQ = sp.getNewQuestion();
-
         Bundle extras = getIntent().getExtras();
         difficulty = extras.getInt("DIFFICULTY");
         numOfQuestions = extras.getInt("NUM_QUESTIONS");

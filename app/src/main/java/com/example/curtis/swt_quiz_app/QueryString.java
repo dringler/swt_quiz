@@ -18,9 +18,6 @@ public class QueryString {
 
         switch (qType) {
             case 0: //career start of artist/band
-                RandomInt randomInt = new RandomInt();
-                int rOffset = randomInt.getRandInt(0, 100);
-
                 if (listNum == 0) { //bands
                     queryStringQ =
                             "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
@@ -33,11 +30,7 @@ public class QueryString {
                                     "    ?artist dbo:activeYearsStartYear ?dboStartYear .\n" +
                                     "FILTER\n" +
                                     "(?artist = <" + artist + ">) .\n" +
-                                    "  }\n";
-
-                                    // "ORDER BY DESC(?dboStartYear)\n" +
-//                                    "OFFSET " + rOffset + "\n" +
-//                                    "LIMIT   1";
+                                    "  }";
                     queryString = removeQuotation(queryStringQ);
 
                 } else { //musicians
@@ -53,33 +46,41 @@ public class QueryString {
                                     "    ?artist dbo:activeYearsStartYear ?dboStartYear .\n" +
                                     "FILTER\n" +
                                     "(?artist = <" + artist +">) .\n" +
-                                    "  }\n";
-//                                    // "ORDER BY DESC(?dboStartYear)\n" +
-//                                    "OFFSET " + rOffset + "\n" +
-//                                    "LIMIT   1";
+                                    "  }";
                     queryString = removeQuotation(queryStringQ);
                 }
                 break;
             //add more cases here for different question types
             case 1:
-                queryStringQ =
-                        "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
-                                "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
-                                "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
-                                "\n" +
-                                "SELECT DISTINCT  ?artist ?dboStartYear ?dboEndYear\n" +
-                                "WHERE\n" +
-                                "  { ?artist <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> dbo:MusicalArtist .\n" +
-                                "    ?artist dbo:activeYearsStartYear ?dboStartYear .\n" +
-                                "    OPTIONAL\n" +
-                                "      { ?artist dbo:activeYearsEndYear ?dboEndYear} .\n" +
-                                "FILTER\n" +
-                                "(?dboStartYear > 1970-01-01) .\n" +
-                                "  }\n" +
-                                // "ORDER BY DESC(?dboStartYear)\n" +
-//                                "OFFSET " + rOffset + "\n" +
-                                "LIMIT   1";
-                queryString = removeQuotation(queryStringQ);
+                if (listNum == 0) { //bands
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "\n" +
+                                    "SELECT DISTINCT  ?artist ?dboEndYear\n" +
+                                    "WHERE\n" +
+                                    "  { ?artist <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> dbo:Band .\n" +
+                                    "    ?artist dbo:activeYearsEndYear ?dboEndYear .\n" +
+                                    "FILTER\n" +
+                                    "(?artist = <" + artist +">) .\n" +
+                                    "  }";
+                    queryString = removeQuotation(queryStringQ);
+                } else { //musicians
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "\n" +
+                                    "SELECT DISTINCT  ?artist ?dboEndYear\n" +
+                                    "WHERE\n" +
+                                    "  { ?artist <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> dbo:MusicalArtist .\n" +
+                                    "    ?artist dbo:activeYearsEndYear ?dboEndYear .\n" +
+                                    "FILTER\n" +
+                                    "(?artist = <" + artist +">) .\n" +
+                                    "  }";
+                    queryString = removeQuotation(queryStringQ);
+                 }
 
                 break;
         }
