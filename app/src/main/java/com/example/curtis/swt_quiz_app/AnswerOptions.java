@@ -20,7 +20,7 @@ public class AnswerOptions {
         //ger variation
         if (difficulty==0) { //difficulty=easy
             //higher variation from right answer
-            variation = randomVariation.getRandInt(1,25);
+            variation = randomVariation.getRandInt(5,25);
         } else { //difficulty = hard
             //lower variation from right answer
             variation = randomVariation.getRandInt(1,10);
