@@ -11,6 +11,7 @@ public class ResultVariables {
     String endYear = "";
     String hometown = "";
     String albumname ="";
+    String songname = "";
 
     public String getArtist(QuerySolution sol) {
         if (sol.get("artist") == null) {
@@ -26,7 +27,7 @@ public class ResultVariables {
             }
             artist = artist.replaceAll("_", " ");
         }
-        System.out.println("artist: " + artist);
+//        System.out.println("artist: " + artist);
         return artist;
     }
 
@@ -39,7 +40,7 @@ public class ResultVariables {
         } else {
             startYear = sol.getResource("dboStartYear").getURI();
         }
-        System.out.println("startYear: " + startYear);
+//        System.out.println("startYear: " + startYear);
         return startYear;
     }
 
@@ -51,7 +52,7 @@ public class ResultVariables {
         } else {
             endYear = sol.getResource("dboEndYear").getURI();
         }
-        System.out.println("endYear: " + endYear);
+//        System.out.println("endYear: " + endYear);
         return endYear;
     }
 
@@ -69,7 +70,7 @@ public class ResultVariables {
             }
             hometown = hometown.replaceAll("_", " ");
         }
-        System.out.println("hometown: " + hometown);
+//        System.out.println("hometown: " + hometown);
         return hometown;
     }
 
@@ -87,7 +88,26 @@ public class ResultVariables {
             }
             albumname = albumname.replaceAll("_", " ");
         }
-        System.out.println("albumname: " + albumname);
+//        System.out.println("albumname: " + albumname);
         return albumname;
+    }
+
+    public String getSongname(QuerySolution sol) {
+        if (sol.get("songname") == null) {
+            songname = null;
+        } else if (sol.get("songname").isLiteral()) {
+            songname = sol.getLiteral("songname").toString();
+        } else {
+            songname = sol.getResource("songname").getURI().substring(28);
+            int index = 0;
+            index = songname.indexOf("(");
+            if (index > 2) {
+                songname = songname.substring(0, index - 1);
+            }
+            songname = songname.replaceAll("_", " ");
+        }
+        System.out.println("songname: " + songname);
+        return songname;
+
     }
 }

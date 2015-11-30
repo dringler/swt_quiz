@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -34,11 +33,16 @@ public class QuizActivity extends AppCompatActivity {
     TextView txtQuestion;
     Button bA, bB, bC, bD;
     List<String> bands = new ArrayList<String>();
+    List<String> bandsSong = new ArrayList<String>();
     List<String> inactiveBands = new ArrayList<String>();
     List<String> allBands = new ArrayList<String>();
     List<String> musicians = new ArrayList<String>();
+    List<String> musiciansSong = new ArrayList<String>();
     List<String> inactiveMusicians = new ArrayList<String>();
     List<String> allMusicians = new ArrayList<String>();
+
+    List<String> countriesAndStates = new ArrayList<String>();
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -60,8 +64,13 @@ public class QuizActivity extends AppCompatActivity {
 
         bands = csvParser.getCSV("bands_top10.csv");
         inactiveBands = csvParser.getCSV("inactive_bands_top10.csv");
+        bandsSong = csvParser.getCSV("bands_top10_song.csv");
         musicians = csvParser.getCSV("musicians_top10.csv");
+        musiciansSong = csvParser.getCSV("musicians_top10_song.csv");
         inactiveMusicians = csvParser.getCSV("inactive_musicians_top10.csv");
+
+        countriesAndStates = csvParser.getCountriesAndStatesCSV("dbpedia_countries_and_american_states.csv");
+
 
         //List for all bands (active and inactive)
         //add all bands
@@ -229,9 +238,10 @@ public class QuizActivity extends AppCompatActivity {
         protected Question doInBackground(Void... params) {
             boolean trying = true;
             Question nq = new Question();
+
             while (trying) {
                 try {
-                    nq = sp.getNewQuestion(difficulty, bands, inactiveBands, allBands, musicians, inactiveMusicians, allMusicians);
+                    nq = sp.getNewQuestion(difficulty, bands, bandsSong, inactiveBands, allBands, musicians, musiciansSong, inactiveMusicians, allMusicians, countriesAndStates);
                     trying = false;
 //                    return nq;
                 } catch (Exception e) {
@@ -275,6 +285,29 @@ public class QuizActivity extends AppCompatActivity {
             }
         return returnList;
         }
+        private List<String> getCountriesAndStatesCSV(String filepath) {
+            List<String> returnList = new ArrayList<String>();
+
+            InputStreamReader is = null;
+            try {
+                is = new InputStreamReader(getAssets()
+                        .open(filepath));
+
+                BufferedReader reader = new BufferedReader(is);
+                reader.readLine();
+                String data;
+                while ((data = reader.readLine()) != null) {
+                    String[] line = data.split(",");
+                    if (line.length > 0) {
+                        returnList.add(line[0]);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return returnList;
+        }
+
 
     }
     @Override

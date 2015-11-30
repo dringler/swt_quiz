@@ -9,11 +9,9 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 
 
 /**
@@ -28,15 +26,19 @@ public class SparqlHelper {
     private static final String KEY_OPTD = "optd"; //option d
     private static final String KEY_ANSWER = "answer"; //correct option
 
-    public Question getNewQuestion(int diff,  List<String> b,  List<String> iB, List<String> aB, List<String> m,  List<String> iM, List<String> aM) {
+    public Question getNewQuestion(int diff,  List<String> b, List<String> bS, List<String> iB, List<String> aB, List<String> m,  List<String> mS, List<String> iM, List<String> aM,  List<String> cs) {
 
         int difficulty = diff;
         List<String> bands = b;
+        List<String> bandsSong = bS;
         List<String> inactiveBands = iB;
         List<String> allBands = aB;
         List<String> musicians = m;
+        List<String> musiciansSong = mS;
         List<String> inactiveMusicians = iM;
         List<String> allMusicians = aM;
+        List<String> countriesAndStates = cs;
+
 
 
         int qType = 0; //question type
@@ -49,13 +51,14 @@ public class SparqlHelper {
         String endYear = "";
         String hometown = "";
         String albumname = "";
+        String songname = "";
 
         Question q = new Question();
         QueryString qs = new QueryString();
 
         //random question type
         RandomInt randomIntQ = new RandomInt();
-        qType = randomIntQ.getRandInt(0, 3); //randInt(min, max)
+        qType = randomIntQ.getRandInt(0, 4); //randInt(min, max)
 
         RandomInt randomIntL = new RandomInt();
         switch (qType) {
@@ -91,6 +94,14 @@ public class SparqlHelper {
                     queryString = qs.getQueryString(qType, listNum, allMusicians);
                 }
                 break;
+            case 4: //4: which song is from the following artist/band
+                listNum = randomIntL.getRandInt(0, 1);
+                if (listNum == 0) { //band
+                    queryString = qs.getQueryString(qType, listNum, bandsSong);
+                } else { //musician
+                    queryString = qs.getQueryString(qType, listNum, musiciansSong);
+                }
+                break;
         }
 
 
@@ -107,6 +118,9 @@ public class SparqlHelper {
             //ResultSetFormatter.out(System.out, output);
 
             List<String> seenArtist = new ArrayList<String>();
+            String currentArtist = "";
+            String lastArtist = "";
+            String lastAnswer ="";
 
             String rightAnswer = "";
             String wrongAnswer1 = "";
@@ -163,37 +177,122 @@ public class SparqlHelper {
                             case 0:
                                 artist = resultVariables.getArtist(sol);
                                 hometown = resultVariables.getHometown(sol);
-                                q.setQUESTION("Where is " + artist + " from?");
-                                q.setANSWER(hometown);
-                                rightAnswer = hometown;
-                                seenArtist.add(artist);
-                                resultCounter++;
+
+                                //check for next artist without increasing result counter
+                               if (artist.equals(lastArtist) || lastArtist == "") {
+                                   if (!countriesAndStates.contains(hometown)) {
+                                       q.setQUESTION("Where is " + artist + " from?");
+                                       q.setANSWER(hometown);
+                                       rightAnswer = hometown;
+                                       seenArtist.add(artist);
+                                       lastArtist = "";
+                                       resultCounter++;
+                                   } else {
+                                       lastArtist = artist;
+                                       lastAnswer = hometown;
+                                   }
+                                //no valid values in hometown attribute
+                               } else {
+                                   q.setQUESTION("Where is " + lastArtist + " from?");
+                                   q.setANSWER(lastAnswer);
+                                   rightAnswer = lastAnswer;
+                                   seenArtist.add(lastArtist);
+                                   resultCounter++;
+                                   //do case 1 here already as new artist is queried and old artist has no valid attribute
+                                   if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                       currentArtist = resultVariables.getArtist(sol);
+                                       wrongAnswer1 = resultVariables.getHometown(sol);
+                                       if (!countriesAndStates.contains(wrongAnswer1)) {
+                                           seenArtist.add(resultVariables.getArtist(sol));
+                                           lastArtist = "";
+                                           resultCounter++;
+                                       } else {
+                                           lastArtist = currentArtist;
+                                           lastAnswer = hometown;
+                                       }
+                                   }
+                               }
                                 break;
                             case 1:
-                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
-                                    wrongAnswer1 = resultVariables.getHometown(sol);
-                                    seenArtist.add(resultVariables.getArtist(sol));
+                                currentArtist = resultVariables.getArtist(sol);
+                                if (currentArtist.equals(lastArtist) || lastArtist =="") {
+                                    if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                        wrongAnswer1 = resultVariables.getHometown(sol);
+                                        if (!countriesAndStates.contains(wrongAnswer1)) {
+                                            seenArtist.add(resultVariables.getArtist(sol));
+                                            lastArtist = "";
+                                            resultCounter++;
+                                        } else {
+                                            lastArtist = currentArtist;
+                                            lastAnswer = hometown;
+                                        }
+                                    }
+                                } else {
+                                    wrongAnswer1 = lastAnswer;
+                                    seenArtist.add(lastArtist);
                                     resultCounter++;
+                                    //do case 2 already as new artist is queried and old artist has no valid attribute
+                                    if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                        wrongAnswer2 = resultVariables.getHometown(sol);
+                                        if (!countriesAndStates.contains(wrongAnswer2)) {
+                                            seenArtist.add(resultVariables.getArtist(sol));
+                                            lastArtist = "";
+                                            resultCounter++;
+                                        } else {
+                                            lastArtist = currentArtist;
+                                            lastAnswer = hometown;
+                                        }
+                                    }
                                 }
                                 break;
                             case 2:
-                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
-                                    wrongAnswer2 = resultVariables.getHometown(sol);
-                                    seenArtist.add(resultVariables.getArtist(sol));
+                                currentArtist = resultVariables.getArtist(sol);
+                                if (currentArtist.equals(lastArtist) || lastArtist == "") {
+                                    if (!seenArtist.contains(resultVariables.getArtist(sol))) {
+                                        wrongAnswer2 = resultVariables.getHometown(sol);
+                                        if (!countriesAndStates.contains(wrongAnswer2)) {
+                                            seenArtist.add(resultVariables.getArtist(sol));
+                                            lastArtist = "";
+                                            resultCounter++;
+                                        } else {
+                                            lastArtist = currentArtist;
+                                            lastAnswer = hometown;
+                                        }
+                                    }
+                                } else {
+                                    wrongAnswer1 = lastAnswer;
+                                    seenArtist.add(lastArtist);
                                     resultCounter++;
+                                    //do case 2 already as new artist is queried and old artist has no valid attribute
+                                    if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                        wrongAnswer3 = resultVariables.getHometown(sol);
+                                        if (!countriesAndStates.contains(wrongAnswer3)) {
+                                            seenArtist.add(resultVariables.getArtist(sol));
+                                            lastArtist = "";
+                                            resultCounter++;
+                                        } else {
+                                            lastArtist = currentArtist;
+                                            lastAnswer = hometown;
+                                        }
+                                    }
+
                                 }
                                 break;
                             case 3:
-                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
-                                    wrongAnswer3 = resultVariables.getHometown(sol);
-                                    seenArtist.add(resultVariables.getArtist(sol));
-                                    resultCounter++;
-                                }
+                                    if (!seenArtist.contains(resultVariables.getArtist(sol))) {
+                                        wrongAnswer3 = resultVariables.getHometown(sol);
+                                        if (!countriesAndStates.contains(wrongAnswer3) || results.hasNext() == false) {
+                                            seenArtist.add(resultVariables.getArtist(sol));
+                                            lastArtist = "";
+                                            resultCounter++;
+                                            break nextResultLoop;
+                                        }
+                                    }
                                 break;
                             default:
                                 if (!seenArtist.contains(resultVariables.getArtist(sol))){
                                     wrongAnswer3 = resultVariables.getHometown(sol);
-                                    seenArtist.add(resultVariables.getArtist(sol));
+                                        seenArtist.add(resultVariables.getArtist(sol));
                                 }
                                 break;
                         }
@@ -238,8 +337,46 @@ public class SparqlHelper {
                                 break;
                         }
                         continue nextResultLoop;
-
-
+                    case 4: //3:which song is from the following artist/band
+                        switch (resultCounter) {
+                            case 0:
+                                artist = resultVariables.getArtist(sol);
+                                songname = resultVariables.getSongname(sol);
+                                q.setQUESTION("Which song was released by \n" + artist + "?");
+                                q.setANSWER(songname);
+                                rightAnswer = songname;
+                                seenArtist.add(artist);
+                                resultCounter++;
+                                break;
+                            case 1:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer1 = resultVariables.getSongname(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                    resultCounter++;
+                                }
+                                break;
+                            case 2:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer2 = resultVariables.getSongname(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                    resultCounter++;
+                                }
+                                break;
+                            case 3:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer3 = resultVariables.getSongname(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                    resultCounter++;
+                                }
+                                break;
+                            default:
+                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
+                                    wrongAnswer3 = resultVariables.getSongname(sol);
+                                    seenArtist.add(resultVariables.getArtist(sol));
+                                }
+                                break;
+                        }
+                        continue nextResultLoop;
                 }
             }
 
@@ -272,8 +409,12 @@ public class SparqlHelper {
                     q.setOPTD(rightAnswer);
                     break;
             }
+
+
         } catch (Exception e) {
             e.printStackTrace();
+            //no dbpedia connection
+            //"The web-site you are currently trying to access is under maintenance at this time.""
         }
         qexec.close();
 

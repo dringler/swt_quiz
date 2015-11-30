@@ -76,7 +76,7 @@ public class QueryString {
                                     "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
                                     "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
                                     "\n" +
-                                    "SELECT DISTINCT  ?artist ?dboEndYear\n" +
+                                    "SELECT DISTINCT ?artist ?dboEndYear\n" +
                                     "WHERE\n" +
                                     "  { ?artist <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> dbo:MusicalArtist .\n" +
                                     "    ?artist dbo:activeYearsEndYear ?dboEndYear .\n" +
@@ -158,6 +158,47 @@ public class QueryString {
                                     "?artist a dbo:MusicalArtist .\n" +
                                     "?albumname dbo:artist ?artist .\n" +
                                     "?albumname a dbo:Album .\n" +
+                                    "FILTER (?artist = <" + artist + "> || " +
+                                    "?artist = <" + artist2 + "> || " +
+                                    "?artist = <" + artist3 + "> || " +
+                                    "?artist = <" + artist4 + ">) .\n" +
+                                    "}";
+                    queryString = removeQuotation(queryStringQ);
+                }
+                break;
+            case 4: //3:which song is from the following artist/band
+                fourArtists = getFourRandomArtists(list);
+                artist = fourArtists.get(0);
+                artist2 = fourArtists.get(1);
+                artist3 = fourArtists.get(2);
+                artist4 = fourArtists.get(3);
+
+                if (listNum == 0) { //bands
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "SELECT DISTINCT ?artist ?songname \n" +
+                                    "WHERE {\n" +
+                                    "?artist a dbo:Band .\n" +
+                                    "?songname dbo:artist ?artist .\n" +
+                                    "?songname a dbo:Song .\n" +
+                                    "FILTER (?artist = <" + artist + "> || " +
+                                    "?artist = <" + artist2 + "> || " +
+                                    "?artist = <" + artist3 + "> || " +
+                                    "?artist = <" + artist4 + ">) .\n" +
+                                    "}";
+                    queryString = removeQuotation(queryStringQ);
+                } else { //musicians
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "SELECT DISTINCT ?artist ?songname \n" +
+                                    "WHERE {\n" +
+                                    "?artist a dbo:MusicalArtist .\n" +
+                                    "?songname dbo:artist ?artist .\n" +
+                                    "?songname a dbo:Song .\n" +
                                     "FILTER (?artist = <" + artist + "> || " +
                                     "?artist = <" + artist2 + "> || " +
                                     "?artist = <" + artist3 + "> || " +
