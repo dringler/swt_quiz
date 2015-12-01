@@ -146,7 +146,8 @@ public class QueryString {
                                     "?artist = <" + artist2 + "> || " +
                                     "?artist = <" + artist3 + "> || " +
                                     "?artist = <" + artist4 + ">) .\n" +
-                                    "}";
+                                    "}" +
+                                    "ORDER BY ?artist";
                     queryString = removeQuotation(queryStringQ);
                 } else { //musicians
                     queryStringQ =
@@ -162,7 +163,8 @@ public class QueryString {
                                     "?artist = <" + artist2 + "> || " +
                                     "?artist = <" + artist3 + "> || " +
                                     "?artist = <" + artist4 + ">) .\n" +
-                                    "}";
+                                    "}" +
+                                    "ORDER BY ?artist";
                     queryString = removeQuotation(queryStringQ);
                 }
                 break;
@@ -187,7 +189,8 @@ public class QueryString {
                                     "?artist = <" + artist2 + "> || " +
                                     "?artist = <" + artist3 + "> || " +
                                     "?artist = <" + artist4 + ">) .\n" +
-                                    "}";
+                                    "}" +
+                                    "ORDER BY ?artist";
                     queryString = removeQuotation(queryStringQ);
                 } else { //musicians
                     queryStringQ =
@@ -203,7 +206,8 @@ public class QueryString {
                                     "?artist = <" + artist2 + "> || " +
                                     "?artist = <" + artist3 + "> || " +
                                     "?artist = <" + artist4 + ">) .\n" +
-                                    "}";
+                                    "}" +
+                                    "ORDER BY ?artist";
                     queryString = removeQuotation(queryStringQ);
                 }
                 break;
