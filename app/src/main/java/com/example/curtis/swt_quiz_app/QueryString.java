@@ -49,7 +49,7 @@ public class QueryString {
                                     "  { ?artist <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> dbo:MusicalArtist .\n" +
                                     "    ?artist dbo:activeYearsStartYear ?dboStartYear .\n" +
                                     "FILTER\n" +
-                                    "(?artist = <" + artist +">) .\n" +
+                                    "(?artist = <" + artist + ">) .\n" +
                                     "  }";
                     queryString = removeQuotation(queryStringQ);
                 }
@@ -67,7 +67,7 @@ public class QueryString {
                                     "  { ?artist <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> dbo:Band .\n" +
                                     "    ?artist dbo:activeYearsEndYear ?dboEndYear .\n" +
                                     "FILTER\n" +
-                                    "(?artist = <" + artist +">) .\n" +
+                                    "(?artist = <" + artist + ">) .\n" +
                                     "  }";
                     queryString = removeQuotation(queryStringQ);
                 } else { //musicians
@@ -81,10 +81,10 @@ public class QueryString {
                                     "  { ?artist <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> dbo:MusicalArtist .\n" +
                                     "    ?artist dbo:activeYearsEndYear ?dboEndYear .\n" +
                                     "FILTER\n" +
-                                    "(?artist = <" + artist +">) .\n" +
+                                    "(?artist = <" + artist + ">) .\n" +
                                     "  }";
                     queryString = removeQuotation(queryStringQ);
-                 }
+                }
                 break;
             case 2: //hometown of artist/band
                 fourArtists = getFourRandomArtists(list);
@@ -109,20 +109,20 @@ public class QueryString {
                                     "}";
                     queryString = removeQuotation(queryStringQ);
                 } else { //musicians
-                     queryStringQ =
-                             "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
-                                     "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
-                                     "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
-                                     "SELECT DISTINCT ?artist ?hometown\n" +
-                                     "WHERE {\n" +
-                                     "?artist a dbo:MusicalArtist .\n" +
-                                     "?artist dbo:hometown ?hometown .\n" +
-                                     "FILTER (?artist = <" + artist + "> || " +
-                                     "?artist = <" + artist2 + "> || " +
-                                     "?artist = <" + artist3 + "> || " +
-                                     "?artist = <" + artist4 + ">) .\n" +
-                                     "}";
-                     queryString = removeQuotation(queryStringQ);
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "SELECT DISTINCT ?artist ?hometown\n" +
+                                    "WHERE {\n" +
+                                    "?artist a dbo:MusicalArtist .\n" +
+                                    "?artist dbo:hometown ?hometown .\n" +
+                                    "FILTER (?artist = <" + artist + "> || " +
+                                    "?artist = <" + artist2 + "> || " +
+                                    "?artist = <" + artist3 + "> || " +
+                                    "?artist = <" + artist4 + ">) .\n" +
+                                    "}";
+                    queryString = removeQuotation(queryStringQ);
                 }
                 break;
             case 3: //3:which album is from the following artist/band
@@ -168,7 +168,7 @@ public class QueryString {
                     queryString = removeQuotation(queryStringQ);
                 }
                 break;
-            case 4: //3:which song is from the following artist/band
+            case 4: //4:which song is from the following artist/band
                 fourArtists = getFourRandomArtists(list);
                 artist = fourArtists.get(0);
                 artist2 = fourArtists.get(1);
@@ -211,6 +211,31 @@ public class QueryString {
                     queryString = removeQuotation(queryStringQ);
                 }
                 break;
+            case 5: //5: which artist is from the following band
+                fourArtists = getFourRandomArtists(list);
+                //get four bands
+                artist = fourArtists.get(0);
+                artist2 = fourArtists.get(1);
+                artist3 = fourArtists.get(2);
+                artist4 = fourArtists.get(3);
+
+                queryStringQ =
+                        "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                                "PREFIX dbo:<http://dbpedia.org/ontology/>\n" +
+                                "SELECT DISTINCT ?band ?artist\n" +
+                                "WHERE {\n" +
+                                "?band rdf:type dbo:Band.\n" +
+                                "?artist rdf:type dbo:MusicalArtist .\n" +
+                                "?band dbo:bandMember ?artist .\n" +
+                                "FILTER (?band = <" + artist + "> || " +
+                                "?band = <" + artist2 + "> || " +
+                                "?band = <" + artist3 + "> || " +
+                                "?band = <" + artist4 + ">) .\n" +
+                                "}" +
+                                "ORDER BY ?band";
+                queryString = removeQuotation(queryStringQ);
+                break;
+
         }
         return queryString;
     }
@@ -226,9 +251,9 @@ public class QueryString {
     private List<String> getFourRandomArtists(List<String> list) {
         List<String> fourArtists = new ArrayList<String>();
         //get random index for artist
-        RandomInt randomA = new RandomInt();
         boolean searching = true;
         while (searching) {
+            RandomInt randomA = new RandomInt();
             int randomArtist = randomA.getRandInt(0, list.size()); //change maximum according to list size (top x)
             String artist = list.get(randomArtist);
             if (!fourArtists.contains(artist)) {

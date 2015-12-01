@@ -26,12 +26,14 @@ public class SparqlHelper {
     private static final String KEY_OPTD = "optd"; //option d
     private static final String KEY_ANSWER = "answer"; //correct option
 
-    public Question getNewQuestion(int diff,  List<String> b, List<String> bS, List<String> iB, List<String> aB, List<String> m,  List<String> mS, List<String> iM, List<String> aM,  List<String> cs) {
+    public Question getNewQuestion(int diff,  List<String> b, List<String> bS, List<String> bM, List<String> iB, List<String> aB, List<String> m,  List<String> mS, List<String> iM, List<String> aM,  List<String> cs) {
         //probability for musicalWork (album/song) changes
         final int musicalWorkMax = 4; //randomInt: 0=change, all other options until max=no change
+        final int artistMax = 1;
         int difficulty = diff;
         List<String> bands = b;
         List<String> bandsSong = bS;
+        List<String> bandsMembers = bM;
         List<String> inactiveBands = iB;
         List<String> allBands = aB;
         List<String> musicians = m;
@@ -48,6 +50,7 @@ public class SparqlHelper {
 
         String queryString = "";
         String artist = "";
+        String band = "";
         String startYear = "";
         String endYear = "";
         String hometown = "";
@@ -61,7 +64,7 @@ public class SparqlHelper {
 
         //random question type
         RandomInt randomIntQ = new RandomInt();
-        qType = randomIntQ.getRandInt(0, 4); //randInt(min, max)
+        qType = randomIntQ.getRandInt(0, 5); //randInt(min, max)
 
         //random list: bands or musicians
         RandomInt randomIntL = new RandomInt();
@@ -106,6 +109,10 @@ public class SparqlHelper {
                     queryString = qs.getQueryString(qType, listNum, musiciansSong);
                 }
                 break;
+            case 5: //5: which artist is a member of the following band
+                listNum = 0; //only for bands
+                queryString = qs.getQueryString(qType, listNum, bandsMembers);
+                break;
         }
 
 
@@ -122,8 +129,12 @@ public class SparqlHelper {
             //ResultSetFormatter.out(System.out, output);
 
             List<String> seenArtist = new ArrayList<String>();
+            List<String> seenBands = new ArrayList<String>();
+            List<String> answerBandMembers = new ArrayList<String>();
             String currentArtist = "";
+            String currentBand = "";
             String lastArtist = "";
+            String lastBand = "";
             String lastAnswer ="";
 
             String rightAnswer = "";
@@ -374,7 +385,7 @@ public class SparqlHelper {
                                     resultCounter++;
                                 }
                                 break;
-                            case 4:
+                            default:
                                 //check if next entry of result is from the same artist of case 3
                                 currentArtist = resultVariables.getArtist(sol);
                                 if (currentArtist.equals(lastArtist)) {
@@ -383,12 +394,6 @@ public class SparqlHelper {
                                     if (album == 0) {
                                         wrongAnswer3 = resultVariables.getAlbumname(sol);
                                     }
-                                }
-                                break;
-                            default:
-                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
-                                    wrongAnswer3 = resultVariables.getAlbumname(sol);
-                                    seenArtist.add(resultVariables.getArtist(sol));
                                 }
                                 break;
                         }
@@ -466,7 +471,7 @@ public class SparqlHelper {
                                     resultCounter++;
                                 }
                                 break;
-                            case 4:
+                            default:
                                 //check if next entry of result is from the same artist of case 3
                                 currentArtist = resultVariables.getArtist(sol);
                                 if (currentArtist.equals(lastArtist)) {
@@ -477,16 +482,120 @@ public class SparqlHelper {
                                     }
                                 }
                                 break;
+                        }
+                        continue nextResultLoop;
+                    case 5:
+                        switch (resultCounter) {
+                            case 0:
+                                artist = resultVariables.getArtist(sol);
+                                band = resultVariables.getBand(sol);
+                                q.setQUESTION("Who is a member of the band \n" + band + "?");
+                                q.setANSWER(artist);
+                                rightAnswer = artist;
+                                seenBands.add(band);
+                                answerBandMembers.add(artist);
+                                lastBand = band;
+                                wrongAnswer1 = "Stevie Wonder";
+                                wrongAnswer2 = "James Brown";
+                                wrongAnswer3 = "Ray Charles";
+                                resultCounter++;
+                                break;
+                            case 1:
+                                //check if next entry of result is from same band of case 0
+                                currentBand = resultVariables.getBand(sol);
+                                currentArtist = resultVariables.getArtist(sol);
+                                if (currentBand.equals(lastBand)) {
+                                    answerBandMembers.add(currentArtist);
+                                    //if entry is also from same artist
+                                    int randomArtist = randomWork.getRandInt(0,artistMax);
+                                    //probability that the song name is changed
+                                    if (randomArtist == 0) {
+                                        artist = currentArtist;
+                                        q.setANSWER(artist);
+                                    }
+                                } else{
+                                    lastBand = currentBand;
+                                }
+                                //current band is new band
+                                if (!seenBands.contains(currentBand)){
+                                    if(!answerBandMembers.contains(currentArtist)) {
+                                        wrongAnswer1 = currentArtist;
+                                        seenBands.add(currentBand);
+                                        resultCounter++;
+                                    }
+                                }
+                                break;
+                            case 2:
+                                //check if next entry of result is from same band of case 1
+                                currentBand = resultVariables.getBand(sol);
+                                currentArtist = resultVariables.getArtist(sol);
+                                if (currentBand.equals(lastBand)) {
+                                    if(!answerBandMembers.contains(currentArtist)) {
+                                        //if entry is also from same artist
+                                        int randomArtist = randomWork.getRandInt(0,artistMax);
+                                        //probability that the song name is changed
+                                        if (randomArtist == 0) {
+                                            wrongAnswer1 = currentArtist;
+                                        }
+                                    }
+                                } else{
+                                    lastBand = currentBand;
+                                }
+                                //current band is new band
+                                if (!seenBands.contains(currentBand)){
+                                    if( !answerBandMembers.contains(currentArtist)) {
+                                        wrongAnswer2 = currentArtist;
+                                        seenBands.add(currentBand);
+                                        resultCounter++;
+                                    }
+                                }
+                                break;
+                            case 3:
+                                //check if next entry of result is from same band of case 2
+                                currentBand = resultVariables.getBand(sol);
+                                currentArtist = resultVariables.getArtist(sol);
+                                if (currentBand.equals(lastBand)) {
+                                    if(!answerBandMembers.contains(currentArtist)) {
+                                        //if entry is also from same artist
+                                        int randomArtist = randomWork.getRandInt(0,artistMax);
+                                        //probability that the song name is changed
+                                        if (randomArtist == 0) {
+                                            wrongAnswer1 = currentArtist;
+                                        }
+                                    }
+                                } else{
+                                    lastBand = currentBand;
+                                }
+                                //current band is new band
+                                if (!seenBands.contains(currentBand)){
+                                    if( !answerBandMembers.contains(currentArtist)) {
+                                        wrongAnswer3 = currentArtist;
+                                        seenBands.add(currentBand);
+                                        resultCounter++;
+                                    }
+                                }
+                                break;
                             default:
-                                if (!seenArtist.contains(resultVariables.getArtist(sol))){
-                                    wrongAnswer3 = resultVariables.getSongname(sol);
-                                    seenArtist.add(resultVariables.getArtist(sol));
+                                //check if next entry of result is from the same band of case 4
+                                currentBand = resultVariables.getBand(sol);
+                                currentArtist = resultVariables.getArtist(sol);
+                                if (currentBand.equals(lastBand)) {
+                                    if(!answerBandMembers.contains(currentArtist)) {
+                                        int randomArtist = randomWork.getRandInt(0, artistMax);
+                                        //probability that the song name is changed
+                                        if (randomArtist == 0) {
+                                            wrongAnswer3 = currentArtist;
+                                        }
+                                    }
                                 }
                                 break;
                         }
+
                         continue nextResultLoop;
+
                 }
             }
+
 
             RandomInt randomAnswer = new RandomInt();
             int answerButton = randomAnswer.getRandInt(1, 4);

@@ -7,6 +7,7 @@ import com.hp.hpl.jena.query.QuerySolution;
  */
 public class ResultVariables {
     String artist = "";
+    String band = "";
     String startYear = "";
     String endYear = "";
     String hometown = "";
@@ -108,6 +109,22 @@ public class ResultVariables {
         }
 //        System.out.println("songname: " + songname);
         return songname;
-
+    }
+    public String getBand(QuerySolution sol) {
+        if (sol.get("band") == null) {
+            band = null;
+        } else if (sol.get("band").isLiteral()) {
+            band = sol.getLiteral("band").toString();
+        } else {
+            band = sol.getResource("band").getURI().substring(28);
+            int index = 0;
+            index = band.indexOf("(");
+            if (index > 2) {
+                band = band.substring(0, index - 1);
+            }
+            band = band.replaceAll("_", " ");
+        }
+//        System.out.println("artist: " + artist);
+        return band;
     }
 }

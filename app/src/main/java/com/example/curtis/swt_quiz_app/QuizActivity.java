@@ -34,6 +34,7 @@ public class QuizActivity extends AppCompatActivity {
     Button bA, bB, bC, bD;
     List<String> bands = new ArrayList<String>();
     List<String> bandsSong = new ArrayList<String>();
+    List<String> bandsMembers = new ArrayList<String>();
     List<String> inactiveBands = new ArrayList<String>();
     List<String> allBands = new ArrayList<String>();
     List<String> musicians = new ArrayList<String>();
@@ -65,10 +66,10 @@ public class QuizActivity extends AppCompatActivity {
         bands = csvParser.getCSV("bands_top10.csv");
         inactiveBands = csvParser.getCSV("inactive_bands_top10.csv");
         bandsSong = csvParser.getCSV("bands_top10_song.csv");
+        bandsMembers = csvParser.getCSV("bands_with_members_top10.csv");
         musicians = csvParser.getCSV("musicians_top10.csv");
         musiciansSong = csvParser.getCSV("musicians_top10_song.csv");
         inactiveMusicians = csvParser.getCSV("inactive_musicians_top10.csv");
-
         countriesAndStates = csvParser.getCountriesAndStatesCSV("dbpedia_countries_and_american_states.csv");
 
 
@@ -241,7 +242,7 @@ public class QuizActivity extends AppCompatActivity {
 
             while (trying) {
                 try {
-                    nq = sp.getNewQuestion(difficulty, bands, bandsSong, inactiveBands, allBands, musicians, musiciansSong, inactiveMusicians, allMusicians, countriesAndStates);
+                    nq = sp.getNewQuestion(difficulty, bands, bandsSong, bandsMembers, inactiveBands, allBands, musicians, musiciansSong, inactiveMusicians, allMusicians, countriesAndStates);
                     trying = false;
 //                    return nq;
                 } catch (Exception e) {
