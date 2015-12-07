@@ -28,18 +28,20 @@ public class SparqlHelper {
     private static final String KEY_OPTD = "optd"; //option d
     private static final String KEY_ANSWER = "answer"; //correct option
 
-    public Question getNewQuestion(int diff,  List<String> b, List<String> bS, List<String> bM, List<String> iB, List<String> aB, List<String> m,  List<String> mS, List<String> iM, List<String> aM,  List<String> cs) {
+    public Question getNewQuestion(int diff,  List<String> b, List<String> bS,  List<String> bA, List<String> bM, List<String> iB, List<String> aB, List<String> m,  List<String> mS,  List<String> mA, List<String> iM, List<String> aM,  List<String> cs) {
         //probability for musicalWork (album/song) changes
         final int musicalWorkMax = 4; //randomInt: 0=change, all other options until max=no change
         final int artistMax = 1;
         int difficulty = diff; //0:easy, 1:hard
         List<String> bands = b;
         List<String> bandsSong = bS;
+        List<String> bandsAlbumRD = bA;
         List<String> bandsMembers = bM;
         List<String> inactiveBands = iB;
         List<String> allBands = aB;
         List<String> musicians = m;
         List<String> musiciansSong = mS;
+        List<String> musiciansAlbumRD = mA;
         List<String> inactiveMusicians = iM;
         List<String> allMusicians = aM;
         List<String> countriesAndStates = cs;
@@ -58,6 +60,7 @@ public class SparqlHelper {
         String hometown = "";
         String albumname = "";
         String songname = "";
+        String releaseDate = "";
 
         RandomInt randomWork = new RandomInt();
         int album;
@@ -67,7 +70,8 @@ public class SparqlHelper {
 
         //random question type
         RandomInt randomIntQ = new RandomInt();
-        qType = randomIntQ.getRandInt(0, 5); //randInt(min, max)
+        qType = randomIntQ.getRandInt(0, 6); //randInt(min, max)
+        qType = 6;
 
         //random list: bands or musicians
         RandomInt randomIntL = new RandomInt();
@@ -116,6 +120,14 @@ public class SparqlHelper {
                 listNum = 0; //only for bands
                 queryString = qs.getQueryString(qType, difficulty, listNum, bandsMembers);
                 break;
+            case 6: //6: When was the following album released?
+                listNum = randomIntL.getRandInt(0, 1);
+                if (listNum == 0) { //band
+                    queryString = qs.getQueryString(qType, difficulty, listNum, bandsAlbumRD);
+                } else { //musician
+                    queryString = qs.getQueryString(qType, difficulty, listNum, musiciansAlbumRD);
+                }
+                break;
         }
 
 
@@ -140,6 +152,7 @@ public class SparqlHelper {
             String currentBand = "";
             String currentSong = "";
             String currentAlbum = "";
+            String currentReleaseDate = "";
             String lastArtist = "";
             String lastBand = "";
             String lastAnswer ="";
@@ -634,6 +647,45 @@ public class SparqlHelper {
                                 break;
                         }
 
+                        continue nextResultLoop;
+                    case 6:
+                        switch (resultCounter) {
+                            case 0:
+                                //get artist
+                                artist = resolveUTF8(resultVariables.getArtist(sol));
+                                //get album
+                                albumname = resolveUTF8(resultVariables.getAlbumname(sol));
+
+                                //get album release date
+                                releaseDate = resultVariables.getReleaseDate(sol);
+
+                                q.setQUESTION("When was the album\n" + albumname + "\n from \n" + artist + "\n first released?");
+                                q.setANSWER(releaseDate);
+
+                                //ger right answer
+                                rightAnswer = releaseDate;
+
+                                wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                                wrongAnswer1 = wrongAnswers.get(0);
+                                wrongAnswer2 = wrongAnswers.get(1);
+                                wrongAnswer3 = wrongAnswers.get(2);
+
+                                resultCounter++;
+                                break;
+                            case 1:
+                                currentAlbum = resolveUTF8(resultVariables.getAlbumname(sol));
+                                currentReleaseDate = resolveUTF8(resultVariables.getReleaseDate(sol));
+
+                                album = randomWork.getRandInt(0, musicalWorkMax);
+                                if (album == 0) {
+                                    albumname = currentAlbum;
+                                    q.setQUESTION("When was the album\n" + albumname + "\n from \n" + artist + "\n first released?");
+                                    q.setANSWER(currentReleaseDate);
+                                    rightAnswer = currentReleaseDate;
+                                }
+
+                                break;
+                        }
                         continue nextResultLoop;
 
                 }

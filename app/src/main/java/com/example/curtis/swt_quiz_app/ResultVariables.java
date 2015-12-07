@@ -10,6 +10,7 @@ public class ResultVariables {
     String band = "";
     String startYear = "";
     String endYear = "";
+    String releaseDate = "";
     String hometown = "";
     String albumname ="";
     String songname = "";
@@ -56,6 +57,19 @@ public class ResultVariables {
 //        System.out.println("endYear: " + endYear);
         return endYear;
     }
+    public String getReleaseDate(QuerySolution sol) {
+        if (sol.get("releaseDate") == null) {
+            releaseDate = null;
+        } else if (sol.get("releaseDate").isLiteral()) {
+            releaseDate = sol.getLiteral("releaseDate").toString().substring(0, 4);
+        } else {
+            releaseDate = sol.getResource("releaseDate").getURI();
+        }
+//        System.out.println("releaseDate: " + releaseDate);
+        return releaseDate;
+    }
+
+
 
     public String getHometown(QuerySolution sol) {
         if (sol.get("hometown") == null) {

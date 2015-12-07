@@ -235,6 +235,47 @@ public class QueryString {
                                 "ORDER BY ?band";
                 queryString = removeQuotation(queryStringQ);
                 break;
+            case 6: //6: When was the following album released?
+                //get random artist
+                artist = getRandomArtist(difficulty, list);
+
+                if (listNum == 0) { //bands
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "SELECT DISTINCT ?artist ?albumname ?releaseDate\n" +
+                                    "WHERE {\n" +
+                                    "?artist a dbo:Band .\n" +
+                                    "?albumname dbo:artist ?artist .\n" +
+                                    "?albumname rdf:type dbo:Album .\n" +
+                                    "?albumname dbo:releaseDate ?releaseDate .\n" +
+                                    "FILTER (?artist = <" + artist + ">) .\n" +
+                                    "}";
+//                                    "ORDER BY ?artist";
+//                                    "ORDER BY ?releaseDate";
+
+                            queryString = removeQuotation(queryStringQ);
+                } else { //musicians
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "SELECT DISTINCT ?artist ?albumname ?releaseDate\n" +
+                                    "WHERE {\n" +
+                                    "?artist a dbo:MusicalArtist .\n" +
+                                    "?albumname dbo:artist ?artist .\n" +
+                                    "?albumname rdf:type dbo:Album .\n" +
+                                    "?albumname dbo:releaseDate ?releaseDate .\n" +
+                                    "FILTER (?artist = <" + artist + ">) . \n " +
+                                    "}";
+//                                    "ORDER BY ?artist";
+//                                    "ORDER BY ?releaseDate";
+                    queryString = removeQuotation(queryStringQ);
+                }
+                break;
 
         }
         return queryString;
