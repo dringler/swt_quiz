@@ -11,7 +11,7 @@ public class QueryString {
     private String queryStringQ = ""; //query string that might have quotes
     private  String queryString = "";
 
-    public String getQueryString(int qType, int listNum, List<String> list) {
+    public String getQueryString(int qType, int difficulty, int listNum, List<String> list) {
         String artist = "";
         List<String> fourArtists = new ArrayList<String>();
         String artist2 = "";
@@ -21,7 +21,7 @@ public class QueryString {
 
         switch (qType) {
             case 0: //career start of artist/band
-                artist = getRandomArtist(list);
+                artist = getRandomArtist(difficulty, list);
                 if (listNum == 0) { //bands
                     queryStringQ =
                             "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
@@ -55,7 +55,7 @@ public class QueryString {
                 }
                 break;
             case 1: //career end of artist/band
-                artist = getRandomArtist(list);
+                artist = getRandomArtist(difficulty, list);
                 if (listNum == 0) { //bands
                     queryStringQ =
                             "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
@@ -87,7 +87,7 @@ public class QueryString {
                 }
                 break;
             case 2: //hometown of artist/band
-                fourArtists = getFourRandomArtists(list);
+                fourArtists = getFourRandomArtists(difficulty, list);
                 artist = fourArtists.get(0);
                 artist2 = fourArtists.get(1);
                 artist3 = fourArtists.get(2);
@@ -126,7 +126,7 @@ public class QueryString {
                 }
                 break;
             case 3: //3:which album is from the following artist/band
-                fourArtists = getFourRandomArtists(list);
+                fourArtists = getFourRandomArtists(difficulty, list);
                 artist = fourArtists.get(0);
                 artist2 = fourArtists.get(1);
                 artist3 = fourArtists.get(2);
@@ -169,7 +169,7 @@ public class QueryString {
                 }
                 break;
             case 4: //4:which song is from the following artist/band
-                fourArtists = getFourRandomArtists(list);
+                fourArtists = getFourRandomArtists(difficulty, list);
                 artist = fourArtists.get(0);
                 artist2 = fourArtists.get(1);
                 artist3 = fourArtists.get(2);
@@ -212,7 +212,7 @@ public class QueryString {
                 }
                 break;
             case 5: //5: which artist is from the following band
-                fourArtists = getFourRandomArtists(list);
+                fourArtists = getFourRandomArtists(difficulty, list);
                 //get four bands
                 artist = fourArtists.get(0);
                 artist2 = fourArtists.get(1);
@@ -240,21 +240,42 @@ public class QueryString {
         return queryString;
     }
 
-    private String getRandomArtist(List<String> list) {
-        //get random index for artist
+    private String getRandomArtist(int difficulty, List<String> list) {
+        //offset
+        int min =0;
+        //limit
+        int max = 20;
+        //random index for artist
         RandomInt randomA = new RandomInt();
-        int randomArtist = randomA.getRandInt(0, list.size()); //change maximum according to list size (top x)
+
+        //minimum offset based on difficulty
+        if (difficulty != 0) {
+            min = 15; //increase offset of random musician if difficulty is hard
+            max = list.size();
+        }
+
+        int randomArtist = randomA.getRandInt(min, max); //change maximum according to list size (top x)
         String artist = list.get(randomArtist);
         return artist;
     }
 
-    private List<String> getFourRandomArtists(List<String> list) {
+    private List<String> getFourRandomArtists(int difficulty, List<String> list) {
         List<String> fourArtists = new ArrayList<String>();
-        //get random index for artist
+        //offset
+        int min = 0;
+        //limit
+        int max = 20;
+        //minimum offset based on difficulty
+        if (difficulty != 0) {
+            min = 15; //increase offset of random musician if difficulty is hard
+            max = list.size();
+        }
+
+        //random index for artist
         boolean searching = true;
         while (searching) {
             RandomInt randomA = new RandomInt();
-            int randomArtist = randomA.getRandInt(0, list.size()); //change maximum according to list size (top x)
+            int randomArtist = randomA.getRandInt(min, max); //change maximum according to list size (top x)
             String artist = list.get(randomArtist);
             if (!fourArtists.contains(artist)) {
                 fourArtists.add(artist);

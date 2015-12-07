@@ -32,7 +32,7 @@ public class SparqlHelper {
         //probability for musicalWork (album/song) changes
         final int musicalWorkMax = 4; //randomInt: 0=change, all other options until max=no change
         final int artistMax = 1;
-        int difficulty = diff;
+        int difficulty = diff; //0:easy, 1:hard
         List<String> bands = b;
         List<String> bandsSong = bS;
         List<String> bandsMembers = bM;
@@ -75,46 +75,46 @@ public class SparqlHelper {
             case 0: //0:career start of artist/band
                 listNum = randomIntL.getRandInt(0, 1);
                 if (listNum == 0) { //band
-                    queryString = qs.getQueryString(qType, listNum, bands);
+                    queryString = qs.getQueryString(qType, difficulty, listNum, bands);
                 } else { //musician
-                    queryString = qs.getQueryString(qType, listNum, musicians);
+                    queryString = qs.getQueryString(qType, difficulty, listNum, musicians);
                 }
                 break;
             case 1: //1:career end of artist/band
                 listNum = randomIntL.getRandInt(0, 1);
                 if (listNum == 0) { //band
-                    queryString = qs.getQueryString(qType, listNum, inactiveBands);
+                    queryString = qs.getQueryString(qType, difficulty, listNum, inactiveBands);
                 } else { //musician
-                    queryString = qs.getQueryString(qType, listNum, inactiveMusicians);
+                    queryString = qs.getQueryString(qType, difficulty, listNum, inactiveMusicians);
                 }
                 break;
             case 2: //2:hometown of artist/band
                 listNum = randomIntL.getRandInt(0, 1);
                 if (listNum == 0) { //band
-                    queryString = qs.getQueryString(qType, listNum, allBands);
+                    queryString = qs.getQueryString(qType, difficulty, listNum, allBands);
                 } else { //musician
-                    queryString = qs.getQueryString(qType, listNum, allMusicians);
+                    queryString = qs.getQueryString(qType, difficulty, listNum, allMusicians);
                 }
                 break;
             case 3: //3:which album is from the following artist/band
                 listNum = randomIntL.getRandInt(0, 1);
                 if (listNum == 0) { //band
-                    queryString = qs.getQueryString(qType, listNum, allBands);
+                    queryString = qs.getQueryString(qType, difficulty, listNum, allBands);
                 } else { //musician
-                    queryString = qs.getQueryString(qType, listNum, allMusicians);
+                    queryString = qs.getQueryString(qType, difficulty, listNum, allMusicians);
                 }
                 break;
             case 4: //4: which song is from the following artist/band
                 listNum = randomIntL.getRandInt(0, 1);
                 if (listNum == 0) { //band
-                    queryString = qs.getQueryString(qType, listNum, bandsSong);
+                    queryString = qs.getQueryString(qType, difficulty, listNum, bandsSong);
                 } else { //musician
-                    queryString = qs.getQueryString(qType, listNum, musiciansSong);
+                    queryString = qs.getQueryString(qType, difficulty, listNum, musiciansSong);
                 }
                 break;
             case 5: //5: which artist is a member of the following band
                 listNum = 0; //only for bands
-                queryString = qs.getQueryString(qType, listNum, bandsMembers);
+                queryString = qs.getQueryString(qType, difficulty, listNum, bandsMembers);
                 break;
         }
 
@@ -134,8 +134,12 @@ public class SparqlHelper {
             List<String> seenArtist = new ArrayList<String>();
             List<String> seenBands = new ArrayList<String>();
             List<String> answerBandMembers = new ArrayList<String>();
+            List<String> answerAlbumNames= new ArrayList<String>();
+            List<String> answerSongNames= new ArrayList<String>();
             String currentArtist = "";
             String currentBand = "";
+            String currentSong = "";
+            String currentAlbum = "";
             String lastArtist = "";
             String lastBand = "";
             String lastAnswer ="";
@@ -420,18 +424,25 @@ public class SparqlHelper {
                                 q.setANSWER(songname);
                                 rightAnswer = songname;
                                 seenArtist.add(artist);
+                                answerSongNames.add(songname);
+//                                //set placeholder for the wrong answer options
+//                                wrongAnswer1 = "";
+//                                wrongAnswer2 = "";
+//                                wrongAnswer3 = "";
                                 lastArtist = artist;
                                 resultCounter++;
                                 break;
                             case 1:
                                 //check if next entry of result is from same artist of case 0
                                 currentArtist = resolveUTF8(resultVariables.getArtist(sol));
+                                currentSong = resolveUTF8(resultVariables.getSongname(sol));
                                 if (currentArtist.equals(lastArtist)) {
                                     //if entry is also from same artist
+                                    answerSongNames.add(songname);
                                     int song = randomWork.getRandInt(0,musicalWorkMax);
                                     //probability that the song name is changed
                                     if (song == 0) {
-                                        songname = resolveUTF8(resultVariables.getSongname(sol));
+                                        songname = currentSong;
                                         q.setANSWER(songname);
                                         rightAnswer = songname;
                                     }
@@ -440,7 +451,9 @@ public class SparqlHelper {
                                 }
                                 //current artist is new artist
                                 if (!seenArtist.contains(currentArtist)){
-                                    wrongAnswer1 = resolveUTF8(resultVariables.getSongname(sol));
+                                    if(!answerSongNames.contains(currentSong)) {
+                                        wrongAnswer1 = currentSong;
+                                    }
                                     seenArtist.add(currentArtist);
                                     resultCounter++;
                                 }
@@ -448,19 +461,24 @@ public class SparqlHelper {
                             case 2:
                                 //check if next entry of result is from same artist of case 0
                                 currentArtist = resolveUTF8(resultVariables.getArtist(sol));
+                                currentSong = resolveUTF8(resultVariables.getSongname(sol));
                                 if (currentArtist.equals(lastArtist)) {
                                     //if entry is also from same artist
                                     int song = randomWork.getRandInt(0,musicalWorkMax);
                                     //probability that the song name is changed
                                     if (song == 0) {
-                                        wrongAnswer1 = resolveUTF8(resultVariables.getSongname(sol));
+                                        if(!answerSongNames.contains(currentSong)) {
+                                            wrongAnswer1 = currentSong;
+                                        }
                                     }
                                 } else{
                                     lastArtist = currentArtist;
                                 }
                                 //current artist is new artist
                                 if (!seenArtist.contains(currentArtist)){
-                                    wrongAnswer2 = resolveUTF8(resultVariables.getSongname(sol));
+                                    if(!answerSongNames.contains(currentSong)) {
+                                        wrongAnswer2 = currentSong;
+                                    }
                                     seenArtist.add(currentArtist);
                                     resultCounter++;
                                 }
@@ -468,19 +486,24 @@ public class SparqlHelper {
                             case 3:
                                 //check if next entry of result is from same artist of case 0
                                 currentArtist = resolveUTF8(resultVariables.getArtist(sol));
+                                currentSong = resolveUTF8(resultVariables.getSongname(sol));
                                 if (currentArtist.equals(lastArtist)) {
                                     //if entry is also from same artist
                                     int song = randomWork.getRandInt(0,musicalWorkMax);
                                     //probability that the song name is changed
                                     if (song == 0) {
-                                        wrongAnswer2 = resolveUTF8(resultVariables.getSongname(sol));
+                                        if(!answerSongNames.contains(currentSong)) {
+                                            wrongAnswer2 = currentSong;
+                                        }
                                     }
                                 } else{
                                     lastArtist = currentArtist;
                                 }
                                 //current artist is new artist
                                 if (!seenArtist.contains(currentArtist)){
-                                    wrongAnswer3 = resolveUTF8(resultVariables.getSongname(sol));
+                                    if(!answerSongNames.contains(currentSong)) {
+                                        wrongAnswer3 = currentSong;
+                                    }
                                     seenArtist.add(currentArtist);
                                     resultCounter++;
                                 }
@@ -488,11 +511,14 @@ public class SparqlHelper {
                             default:
                                 //check if next entry of result is from the same artist of case 3
                                 currentArtist = resolveUTF8(resultVariables.getArtist(sol));
+                                currentSong = resolveUTF8(resultVariables.getSongname(sol));
                                 if (currentArtist.equals(lastArtist)) {
                                     int song = randomWork.getRandInt(0, musicalWorkMax);
                                     //probability that the song name is changed
                                     if (song == 0) {
-                                        wrongAnswer3 = resolveUTF8(resultVariables.getSongname(sol));
+                                        if(!answerSongNames.contains(currentSong)) {
+                                            wrongAnswer3 = currentSong;
+                                        }
                                     }
                                 }
                                 break;
@@ -509,6 +535,7 @@ public class SparqlHelper {
                                 seenBands.add(band);
                                 answerBandMembers.add(artist);
                                 lastBand = band;
+                                lastArtist = artist;
                                 wrongAnswer1 = "Stevie Wonder";
                                 wrongAnswer2 = "James Brown";
                                 wrongAnswer3 = "Ray Charles";
@@ -522,8 +549,9 @@ public class SparqlHelper {
                                     answerBandMembers.add(currentArtist);
                                     //if entry is also from same artist
                                     int randomArtist = randomWork.getRandInt(0,artistMax);
-                                    //probability that the song name is changed
-                                    if (randomArtist == 0) {
+                                    //probability that the right answer is changed
+                                        //check if current artist name is contained in the band
+                                    if (randomArtist == 0 || lastArtist.toLowerCase().contains(band.toLowerCase())) {
                                         artist = currentArtist;
                                         q.setANSWER(artist);
                                         rightAnswer = artist;
@@ -616,7 +644,7 @@ public class SparqlHelper {
 
             RandomInt randomAnswer = new RandomInt();
             int answerButton = randomAnswer.getRandInt(1, 4);
-            
+
             switch (answerButton) {
                 case 1:
                     q.setOPTA(rightAnswer);
