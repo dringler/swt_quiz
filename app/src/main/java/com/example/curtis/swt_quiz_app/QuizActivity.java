@@ -42,6 +42,7 @@ public class QuizActivity extends AppCompatActivity {
     List<String> inactiveMusicians = new ArrayList<String>();
     List<String> allMusicians = new ArrayList<String>();
 
+    List<String> nonDistinctSongs = new ArrayList<String>();
     List<String> countriesAndStates = new ArrayList<String>();
 
     /**
@@ -63,15 +64,29 @@ public class QuizActivity extends AppCompatActivity {
 
         CsvParserClass csvParser = new CsvParserClass();
 
-        bands = csvParser.getCSV("bands_top10.csv");
-        inactiveBands = csvParser.getCSV("inactive_bands_top10.csv");
-        bandsSong = csvParser.getCSV("bands_top10_song.csv");
-        bandsMembers = csvParser.getCSV("bands_with_members_top10.csv");
-        musicians = csvParser.getCSV("musicians_top10.csv");
-        musiciansSong = csvParser.getCSV("musicians_top10_song.csv");
-        inactiveMusicians = csvParser.getCSV("inactive_musicians_top10.csv");
-        countriesAndStates = csvParser.getCountriesAndStatesCSV("dbpedia_countries_and_american_states.csv");
+//        //top 10
+//        bands = csvParser.getCSV("top10/bands_top10.csv");
+//        inactiveBands = csvParser.getCSV("top10/inactive_bands_top10.csv");
+//        bandsSong = csvParser.getCSV("top10/bands_top10_song.csv");
+//        bandsMembers = csvParser.getCSV("top10/bands_with_members_top10.csv");
+//        musicians = csvParser.getCSV("top10/musicians_top10.csv");
+//        musiciansSong = csvParser.getCSV("top10/musicians_top10_song.csv");
+//        inactiveMusicians = csvParser.getCSV("top10/inactive_musicians_top10.csv");
 
+        //top 100
+        bands = csvParser.getCSV("top100/bands_top100.csv");
+        inactiveBands = csvParser.getCSV("top100/inactive_bands_top100.csv");
+        bandsSong = csvParser.getCSV("top100/bands_top100_song.csv");
+        bandsMembers = csvParser.getCSV("top100/bands_with_members_top100.csv");
+        musicians = csvParser.getCSV("top100/musicians_top100.csv");
+        musiciansSong = csvParser.getCSV("top100/musicians_top100_song.csv");
+        inactiveMusicians = csvParser.getCSV("top100/inactive_musicians_top100.csv");
+
+
+
+
+//        nonDistinctSongs = csvParser.getCSV("nonDistinctSongs.csv");
+        countriesAndStates = csvParser.getCountriesAndStatesCSV("dbpedia_countries_and_american_states.csv");
 
         //List for all bands (active and inactive)
         //add all bands
