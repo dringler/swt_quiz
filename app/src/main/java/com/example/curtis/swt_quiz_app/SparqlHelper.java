@@ -192,7 +192,8 @@ public class SparqlHelper {
                             case 0:
                                 artist = resultVariables.getArtist(sol);
                                 hometown = resultVariables.getHometown(sol);
-
+//check against same values!
+//add placeholder cities!
                                 //check for next artist without increasing result counter
                                if (artist.equals(lastArtist) || lastArtist == "") {
                                    if (!countriesAndStates.contains(hometown)) {
@@ -334,6 +335,7 @@ public class SparqlHelper {
                                     if (album == 0) {
                                         albumname = resultVariables.getAlbumname(sol);
                                         q.setANSWER(albumname);
+                                        rightAnswer = albumname;
                                     }
                                 } else{
                                     lastArtist = currentArtist;
@@ -420,6 +422,7 @@ public class SparqlHelper {
                                     if (song == 0) {
                                         songname = resultVariables.getSongname(sol);
                                         q.setANSWER(songname);
+                                        rightAnswer = songname;
                                     }
                                 } else{
                                     lastArtist = currentArtist;
@@ -512,6 +515,7 @@ public class SparqlHelper {
                                     if (randomArtist == 0) {
                                         artist = currentArtist;
                                         q.setANSWER(artist);
+                                        rightAnswer = artist;
                                     }
                                 } else{
                                     lastBand = currentBand;
