@@ -205,7 +205,7 @@ public class SparqlHelper {
                         //get dboEndYear (if available)
                         endYear = resultVariables.getEndYear(sol);
 
-                        q.setQUESTION("When did the musical career of \n" + artist + " end?");
+                        q.setQUESTION("When did the musical career of \n" + artist + " (first) end?");
                         q.setANSWER(endYear);
 
                         //ger right answer
@@ -221,8 +221,10 @@ public class SparqlHelper {
                             case 0:
                                 artist = resolveUTF8(resultVariables.getArtist(sol));
                                 hometown = resolveUTF8(resultVariables.getHometown(sol));
-//check against same values!
-//add placeholder cities!
+                                //placeholder cities
+                                wrongAnswer1 = "Mannheim";
+                                wrongAnswer2 = "Berlin";
+                                wrongAnswer3 = "Hamburg";
                                 //check for next artist without increasing result counter
                                if (artist.equals(lastArtist) || lastArtist == "") {
                                    if (!countriesAndStates.contains(hometown)) {

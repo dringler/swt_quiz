@@ -84,12 +84,12 @@ public class QuizActivity extends AppCompatActivity {
         //top 100 lists
         bands = csvParser.getCSV("top100/b_top100.csv");
         inactiveBands = csvParser.getCSV("top100/ia_b_top100.csv");
-        bandsSong = csvParser.getCSV("top100/b_top100_song.csv");
+        bandsSong = csvParser.getCSV("top100/b_song_top100.csv");
         bandsAlbumRD = csvParser.getCSV("top100/b_album_rd_top100.csv");
         bandsSongRD = csvParser.getCSV("top100/b_song_rd_top100.csv");
         bandsMembers = csvParser.getCSV("top100/b_member_top100.csv");
         musicians = csvParser.getCSV("top100/m_top100.csv");
-        musiciansSong = csvParser.getCSV("top100/m_top100_song.csv");
+        musiciansSong = csvParser.getCSV("top100/m_song_top100.csv");
         inactiveMusicians = csvParser.getCSV("top100/ia_m_top100.csv");
         musiciansAlbumRD = csvParser.getCSV("top100/m_album_rd_top100.csv");
         musiciansSongRD = csvParser.getCSV("top100/m_song_rd_top100.csv");
