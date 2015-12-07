@@ -358,6 +358,10 @@ public class SparqlHelper {
                                 q.setANSWER(albumname);
                                 rightAnswer = albumname;
                                 seenArtist.add(artist);
+                                //set placeholder for the wrong answer options
+                                wrongAnswer1 = "Wall of Arms";
+                                wrongAnswer2 = "Colour It in";
+                                wrongAnswer3 = "Marks to Prove It";
                                 lastArtist = artist;
                                 resultCounter++;
                                 break;
@@ -449,10 +453,10 @@ public class SparqlHelper {
                                 rightAnswer = songname;
                                 seenArtist.add(artist);
                                 answerSongNames.add(songname);
-//                                //set placeholder for the wrong answer options
-//                                wrongAnswer1 = "";
-//                                wrongAnswer2 = "";
-//                                wrongAnswer3 = "";
+                                //set placeholder for the wrong answer options
+                                wrongAnswer1 = "Pelican";
+                                wrongAnswer2 = "Toothpaste Kisses";
+                                wrongAnswer3 = "Marks to Prove It";
                                 lastArtist = artist;
                                 resultCounter++;
                                 break;
