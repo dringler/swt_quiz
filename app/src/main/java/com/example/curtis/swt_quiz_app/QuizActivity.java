@@ -36,11 +36,13 @@ public class QuizActivity extends AppCompatActivity {
     List<String> bandsSong = new ArrayList<String>();
     List<String> bandsMembers = new ArrayList<String>();
     List<String> bandsAlbumRD = new ArrayList<String>();
+    List<String> bandsSongRD = new ArrayList<String>();
     List<String> inactiveBands = new ArrayList<String>();
     List<String> allBands = new ArrayList<String>();
     List<String> musicians = new ArrayList<String>();
     List<String> musiciansSong = new ArrayList<String>();
     List<String> musiciansAlbumRD = new ArrayList<String>();
+    List<String> musiciansSongRD = new ArrayList<String>();
     List<String> inactiveMusicians = new ArrayList<String>();
     List<String> allMusicians = new ArrayList<String>();
 
@@ -71,12 +73,13 @@ public class QuizActivity extends AppCompatActivity {
 //        inactiveBands = csvParser.getCSV("top10/ia_b_top10.csv");
 //        bandsSong = csvParser.getCSV("top10/b_song_top10.csv");
 //        bandsAlbumRD = csvParser.getCSV("top10/b_album_rd_top10.csv");
+//        bandsSongRD = csvParser.getCSV("top10/b_song_rd_top10.csv");
 //        bandsMembers = csvParser.getCSV("top10/b_member_top10.csv");
 //        musicians = csvParser.getCSV("top10/m_top10.csv");
 //        musiciansSong = csvParser.getCSV("top10/m_song_top10.csv");
 //        musiciansAlbumRD = csvParser.getCSV("top10/m_album_rd_top10.csv");
-
-//        inactiveMusicians = csvParser.getCSV("top10/inactive_musicians_top10.csv");
+//        musiciansSongRD = csvParser.getCSV("top10/m_song_rd_top10.csv");
+//        inactiveMusicians = csvParser.getCSV("top10/ia_m_top10.csv");
 
 
         //top 100
@@ -84,11 +87,14 @@ public class QuizActivity extends AppCompatActivity {
         inactiveBands = csvParser.getCSV("top100/ia_b_top100.csv");
         bandsSong = csvParser.getCSV("top100/b_top100_song.csv");
         bandsAlbumRD = csvParser.getCSV("top100/b_album_rd_top100.csv");
+        bandsSongRD = csvParser.getCSV("top100/b_song_rd_top100.csv");
         bandsMembers = csvParser.getCSV("top100/b_member_top100.csv");
         musicians = csvParser.getCSV("top100/m_top100.csv");
         musiciansSong = csvParser.getCSV("top100/m_top100_song.csv");
         inactiveMusicians = csvParser.getCSV("top100/ia_m_top100.csv");
         musiciansAlbumRD = csvParser.getCSV("top100/m_album_rd_top100.csv");
+        musiciansSongRD = csvParser.getCSV("top100/m_song_rd_top100.csv");
+
 
 
 
@@ -265,7 +271,7 @@ public class QuizActivity extends AppCompatActivity {
 
             while (trying) {
                 try {
-                    nq = sp.getNewQuestion(difficulty, bands, bandsSong, bandsAlbumRD, bandsMembers, inactiveBands, allBands, musicians, musiciansSong, musiciansAlbumRD, inactiveMusicians, allMusicians, countriesAndStates);
+                    nq = sp.getNewQuestion(difficulty, bands, bandsSong, bandsAlbumRD, bandsSongRD, bandsMembers, inactiveBands, allBands, musicians, musiciansSong, musiciansAlbumRD, musiciansSongRD, inactiveMusicians, allMusicians, countriesAndStates);
                     trying = false;
 //                    return nq;
                 } catch (Exception e) {

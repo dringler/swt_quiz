@@ -253,9 +253,6 @@ public class QueryString {
                                     "?albumname dbo:releaseDate ?releaseDate .\n" +
                                     "FILTER (?artist = <" + artist + ">) .\n" +
                                     "}";
-//                                    "ORDER BY ?artist";
-//                                    "ORDER BY ?releaseDate";
-
                             queryString = removeQuotation(queryStringQ);
                 } else { //musicians
                     queryStringQ =
@@ -271,11 +268,46 @@ public class QueryString {
                                     "?albumname dbo:releaseDate ?releaseDate .\n" +
                                     "FILTER (?artist = <" + artist + ">) . \n " +
                                     "}";
-//                                    "ORDER BY ?artist";
-//                                    "ORDER BY ?releaseDate";
                     queryString = removeQuotation(queryStringQ);
                 }
                 break;
+            case 7: //when was the following song first released
+                //get random artist
+                artist = getRandomArtist(difficulty, list);
+
+                if (listNum == 0) { //bands
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "SELECT DISTINCT ?artist ?songname ?releaseDate\n" +
+                                    "WHERE {\n" +
+                                    "?artist a dbo:Band .\n" +
+                                    "?songname dbo:artist ?artist .\n" +
+                                    "?songname rdf:type dbo:Song .\n" +
+                                    "?songname dbo:releaseDate ?releaseDate .\n" +
+                                    "FILTER (?artist = <" + artist + ">) .\n" +
+                                    "}";
+                    queryString = removeQuotation(queryStringQ);
+                } else { //musicians
+                    queryStringQ =
+                            "PREFIX  dbo:  <http://dbpedia.org/ontology/>\n" +
+                                    "PREFIX  dbp:  <http://dbpedia.org/property/>\n" +
+                                    "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                                    "PREFIX  dbpedia: <http://dbpedia.org/resource/>\n" +
+                                    "SELECT DISTINCT ?artist ?songname ?releaseDate\n" +
+                                    "WHERE {\n" +
+                                    "?artist a dbo:MusicalArtist .\n" +
+                                    "?songname dbo:artist ?artist .\n" +
+                                    "?songname rdf:type dbo:Song .\n" +
+                                    "?songname dbo:releaseDate ?releaseDate .\n" +
+                                    "FILTER (?artist = <" + artist + ">) . \n " +
+                                    "}";
+                    queryString = removeQuotation(queryStringQ);
+                }
+                break;
+
 
         }
         return queryString;

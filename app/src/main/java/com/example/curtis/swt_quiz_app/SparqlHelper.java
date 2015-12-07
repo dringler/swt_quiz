@@ -28,7 +28,7 @@ public class SparqlHelper {
     private static final String KEY_OPTD = "optd"; //option d
     private static final String KEY_ANSWER = "answer"; //correct option
 
-    public Question getNewQuestion(int diff,  List<String> b, List<String> bS,  List<String> bA, List<String> bM, List<String> iB, List<String> aB, List<String> m,  List<String> mS,  List<String> mA, List<String> iM, List<String> aM,  List<String> cs) {
+    public Question getNewQuestion(int diff,  List<String> b, List<String> bS,  List<String> bA, List<String> bSrd, List<String> bM, List<String> iB, List<String> aB, List<String> m,  List<String> mS,  List<String> mA, List<String> mSrd, List<String> iM, List<String> aM,  List<String> cs) {
         //probability for musicalWork (album/song) changes
         final int musicalWorkMax = 4; //randomInt: 0=change, all other options until max=no change
         final int artistMax = 1;
@@ -36,12 +36,14 @@ public class SparqlHelper {
         List<String> bands = b;
         List<String> bandsSong = bS;
         List<String> bandsAlbumRD = bA;
+        List<String> bandsSongRD = bSrd;
         List<String> bandsMembers = bM;
         List<String> inactiveBands = iB;
         List<String> allBands = aB;
         List<String> musicians = m;
         List<String> musiciansSong = mS;
         List<String> musiciansAlbumRD = mA;
+        List<String> musiciansSongRD = mSrd;
         List<String> inactiveMusicians = iM;
         List<String> allMusicians = aM;
         List<String> countriesAndStates = cs;
@@ -64,14 +66,14 @@ public class SparqlHelper {
 
         RandomInt randomWork = new RandomInt();
         int album;
+        int song;
 
         Question q = new Question();
         QueryString qs = new QueryString();
 
         //random question type
         RandomInt randomIntQ = new RandomInt();
-        qType = randomIntQ.getRandInt(0, 6); //randInt(min, max)
-        qType = 6;
+        qType = randomIntQ.getRandInt(0, 7); //randInt(min, max)
 
         //random list: bands or musicians
         RandomInt randomIntL = new RandomInt();
@@ -126,6 +128,14 @@ public class SparqlHelper {
                     queryString = qs.getQueryString(qType, difficulty, listNum, bandsAlbumRD);
                 } else { //musician
                     queryString = qs.getQueryString(qType, difficulty, listNum, musiciansAlbumRD);
+                }
+                break;
+            case 7: //7: When was the following song released?
+                listNum = randomIntL.getRandInt(0, 1);
+                if (listNum == 0) { //band
+                    queryString = qs.getQueryString(qType, difficulty, listNum, bandsSongRD);
+                } else { //musician
+                    queryString = qs.getQueryString(qType, difficulty, listNum, musiciansSongRD);
                 }
                 break;
         }
@@ -428,7 +438,7 @@ public class SparqlHelper {
                                 break;
                         }
                         continue nextResultLoop;
-                    case 4: //3:which song is from the following artist/band
+                    case 4: //4:which song is from the following artist/band
                         switch (resultCounter) {
                             case 0:
                                 artist = resolveUTF8(resultVariables.getArtist(sol));
@@ -452,7 +462,7 @@ public class SparqlHelper {
                                 if (currentArtist.equals(lastArtist)) {
                                     //if entry is also from same artist
                                     answerSongNames.add(songname);
-                                    int song = randomWork.getRandInt(0,musicalWorkMax);
+                                    song = randomWork.getRandInt(0,musicalWorkMax);
                                     //probability that the song name is changed
                                     if (song == 0) {
                                         songname = currentSong;
@@ -477,7 +487,7 @@ public class SparqlHelper {
                                 currentSong = resolveUTF8(resultVariables.getSongname(sol));
                                 if (currentArtist.equals(lastArtist)) {
                                     //if entry is also from same artist
-                                    int song = randomWork.getRandInt(0,musicalWorkMax);
+                                    song = randomWork.getRandInt(0,musicalWorkMax);
                                     //probability that the song name is changed
                                     if (song == 0) {
                                         if(!answerSongNames.contains(currentSong)) {
@@ -502,7 +512,7 @@ public class SparqlHelper {
                                 currentSong = resolveUTF8(resultVariables.getSongname(sol));
                                 if (currentArtist.equals(lastArtist)) {
                                     //if entry is also from same artist
-                                    int song = randomWork.getRandInt(0,musicalWorkMax);
+                                    song = randomWork.getRandInt(0,musicalWorkMax);
                                     //probability that the song name is changed
                                     if (song == 0) {
                                         if(!answerSongNames.contains(currentSong)) {
@@ -526,7 +536,7 @@ public class SparqlHelper {
                                 currentArtist = resolveUTF8(resultVariables.getArtist(sol));
                                 currentSong = resolveUTF8(resultVariables.getSongname(sol));
                                 if (currentArtist.equals(lastArtist)) {
-                                    int song = randomWork.getRandInt(0, musicalWorkMax);
+                                    song = randomWork.getRandInt(0, musicalWorkMax);
                                     //probability that the song name is changed
                                     if (song == 0) {
                                         if(!answerSongNames.contains(currentSong)) {
@@ -537,7 +547,7 @@ public class SparqlHelper {
                                 break;
                         }
                         continue nextResultLoop;
-                    case 5:
+                    case 5: //5: who is a band member of the following band
                         switch (resultCounter) {
                             case 0:
                                 artist = resolveUTF8(resultVariables.getArtist(sol));
@@ -648,7 +658,7 @@ public class SparqlHelper {
                         }
 
                         continue nextResultLoop;
-                    case 6:
+                    case 6: //6: when was the following album first released
                         switch (resultCounter) {
                             case 0:
                                 //get artist
@@ -659,7 +669,7 @@ public class SparqlHelper {
                                 //get album release date
                                 releaseDate = resultVariables.getReleaseDate(sol);
 
-                                q.setQUESTION("When was the album\n" + albumname + "\n from \n" + artist + "\n first released?");
+                                q.setQUESTION("When was the album\n" + albumname + "\n from " + artist + " first released?");
                                 q.setANSWER(releaseDate);
 
                                 //ger right answer
@@ -679,7 +689,7 @@ public class SparqlHelper {
                                 album = randomWork.getRandInt(0, musicalWorkMax);
                                 if (album == 0) {
                                     albumname = currentAlbum;
-                                    q.setQUESTION("When was the album\n" + albumname + "\n from \n" + artist + "\n first released?");
+                                    q.setQUESTION("When was the album\n" + albumname + "\n from " + artist + " first released?");
                                     q.setANSWER(currentReleaseDate);
                                     rightAnswer = currentReleaseDate;
                                 }
@@ -687,6 +697,46 @@ public class SparqlHelper {
                                 break;
                         }
                         continue nextResultLoop;
+                    case 7: //when was the following song first released
+                        switch (resultCounter) {
+                            case 0:
+                                //get artist
+                                artist = resolveUTF8(resultVariables.getArtist(sol));
+                                //get album
+                                songname = resolveUTF8(resultVariables.getSongname(sol));
+
+                                //get album release date
+                                releaseDate = resultVariables.getReleaseDate(sol);
+
+                                q.setQUESTION("When was the song\n" + songname + "\n from " + artist + " first released?");
+                                q.setANSWER(releaseDate);
+
+                                //ger right answer
+                                rightAnswer = releaseDate;
+
+                                wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                                wrongAnswer1 = wrongAnswers.get(0);
+                                wrongAnswer2 = wrongAnswers.get(1);
+                                wrongAnswer3 = wrongAnswers.get(2);
+
+                                resultCounter++;
+                                break;
+                            case 1:
+                                currentSong = resolveUTF8(resultVariables.getSongname(sol));
+                                currentReleaseDate = resolveUTF8(resultVariables.getReleaseDate(sol));
+
+                                song = randomWork.getRandInt(0, musicalWorkMax);
+                                if (song == 0) {
+                                    songname = currentSong;
+                                    q.setQUESTION("When was the song\n" + songname + "\n from " + artist + " first released?");
+                                    q.setANSWER(currentReleaseDate);
+                                    rightAnswer = currentReleaseDate;
+                                }
+
+                                break;
+                        }
+                        continue nextResultLoop;
+
 
                 }
             }
