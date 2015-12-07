@@ -29,7 +29,6 @@ public class ResultVariables {
             }
             artist = artist.replaceAll("_", " ");
         }
-//        System.out.println("artist: " + artist);
         return artist;
     }
 
@@ -38,11 +37,9 @@ public class ResultVariables {
             startYear = null;
         } else if (sol.get("dboStartYear").isLiteral()) {
             startYear = sol.getLiteral("dboStartYear").toString().substring(0, 4);
-            int startYearInt = Integer.valueOf(startYear);
         } else {
             startYear = sol.getResource("dboStartYear").getURI();
         }
-//        System.out.println("startYear: " + startYear);
         return startYear;
     }
 
@@ -54,7 +51,6 @@ public class ResultVariables {
         } else {
             endYear = sol.getResource("dboEndYear").getURI();
         }
-//        System.out.println("endYear: " + endYear);
         return endYear;
     }
     public String getReleaseDate(QuerySolution sol) {
@@ -65,7 +61,6 @@ public class ResultVariables {
         } else {
             releaseDate = sol.getResource("releaseDate").getURI();
         }
-//        System.out.println("releaseDate: " + releaseDate);
         return releaseDate;
     }
 
@@ -85,7 +80,6 @@ public class ResultVariables {
             }
             hometown = hometown.replaceAll("_", " ");
         }
-//        System.out.println("hometown: " + hometown);
         return hometown;
     }
 
@@ -103,7 +97,6 @@ public class ResultVariables {
             }
             albumname = albumname.replaceAll("_", " ");
         }
-//        System.out.println("albumname: " + albumname);
         return albumname;
     }
 
@@ -121,7 +114,6 @@ public class ResultVariables {
             }
             songname = songname.replaceAll("_", " ");
         }
-//        System.out.println("songname: " + songname);
         return songname;
     }
     public String getBand(QuerySolution sol) {
@@ -138,7 +130,6 @@ public class ResultVariables {
             }
             band = band.replaceAll("_", " ");
         }
-//        System.out.println("artist: " + artist);
         return band;
     }
 }

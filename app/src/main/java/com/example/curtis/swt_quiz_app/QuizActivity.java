@@ -68,7 +68,7 @@ public class QuizActivity extends AppCompatActivity {
 
         CsvParserClass csvParser = new CsvParserClass();
 
-//        //top 10
+//        //top 10 lists
 //        bands = csvParser.getCSV("top10/b_top10.csv");
 //        inactiveBands = csvParser.getCSV("top10/ia_b_top10.csv");
 //        bandsSong = csvParser.getCSV("top10/b_song_top10.csv");
@@ -81,8 +81,7 @@ public class QuizActivity extends AppCompatActivity {
 //        musiciansSongRD = csvParser.getCSV("top10/m_song_rd_top10.csv");
 //        inactiveMusicians = csvParser.getCSV("top10/ia_m_top10.csv");
 
-
-        //top 100
+        //top 100 lists
         bands = csvParser.getCSV("top100/b_top100.csv");
         inactiveBands = csvParser.getCSV("top100/ia_b_top100.csv");
         bandsSong = csvParser.getCSV("top100/b_top100_song.csv");
@@ -94,10 +93,6 @@ public class QuizActivity extends AppCompatActivity {
         inactiveMusicians = csvParser.getCSV("top100/ia_m_top100.csv");
         musiciansAlbumRD = csvParser.getCSV("top100/m_album_rd_top100.csv");
         musiciansSongRD = csvParser.getCSV("top100/m_song_rd_top100.csv");
-
-
-
-
 
 //        nonDistinctSongs = csvParser.getCSV("nonDistinctSongs.csv");
         countriesAndStates = csvParser.getCountriesAndStatesCSV("dbpedia_countries_and_american_states.csv");
@@ -305,9 +300,9 @@ public class QuizActivity extends AppCompatActivity {
                     String[] line = data.split(",");
                     if (line.length > 1) {
                         returnList.add(line[0]);
-                        String artist = line[0];
-                        String rank = line[1];
-                        Log.d("csv output", "added artist: " + artist + " with rank: " + rank + " to ArrayList");
+//                        String artist = line[0];
+//                        String rank = line[1];
+//                        Log.d("csv output", "added artist: " + artist + " with rank: " + rank + " to ArrayList");
                     }
                 }
             } catch (IOException e) {

@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
     // min and max number of Questions
     public final int minQ = 1;
-    public final int maxQ = 10;
+    public final int maxQ = 25;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

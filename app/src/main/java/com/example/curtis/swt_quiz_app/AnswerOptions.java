@@ -1,8 +1,6 @@
 package com.example.curtis.swt_quiz_app;
 
 
-import java.util.Random;
-
 /**
  * Created by curtis on 27/11/15.
  */

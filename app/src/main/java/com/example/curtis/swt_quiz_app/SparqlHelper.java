@@ -156,7 +156,6 @@ public class SparqlHelper {
             List<String> seenArtist = new ArrayList<String>();
             List<String> seenBands = new ArrayList<String>();
             List<String> answerBandMembers = new ArrayList<String>();
-            List<String> answerAlbumNames= new ArrayList<String>();
             List<String> answerSongNames= new ArrayList<String>();
             String currentArtist = "";
             String currentBand = "";
