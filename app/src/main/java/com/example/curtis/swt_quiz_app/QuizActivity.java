@@ -297,7 +297,7 @@ public class QuizActivity extends AppCompatActivity {
                 reader.readLine();
                 String data;
                 while ((data = reader.readLine()) != null) {
-                    String[] line = data.split(",");
+                    String[] line = data.split(";");
                     if (line.length > 1) {
                         returnList.add(line[0]);
 //                        String artist = line[0];
