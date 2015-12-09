@@ -761,6 +761,10 @@ public class SparqlHelper {
                                         q.setANSWER(currentReleaseDate);
                                         rightAnswer = currentReleaseDate;
                                         releaseDate = currentReleaseDate;
+                                        wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                                        wrongAnswer1 = wrongAnswers.get(0);
+                                        wrongAnswer2 = wrongAnswers.get(1);
+                                        wrongAnswer3 = wrongAnswers.get(2);
                                     }
                                 }
                                 seenAlbums.add(currentAlbum);
@@ -824,6 +828,10 @@ public class SparqlHelper {
                                         q.setANSWER(currentReleaseDate);
                                         rightAnswer = currentReleaseDate;
                                         releaseDate = currentReleaseDate;
+                                        wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                                        wrongAnswer1 = wrongAnswers.get(0);
+                                        wrongAnswer2 = wrongAnswers.get(1);
+                                        wrongAnswer3 = wrongAnswers.get(2);
                                     }
 
                                 }
