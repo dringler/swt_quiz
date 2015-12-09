@@ -155,6 +155,8 @@ public class SparqlHelper {
 
             List<String> seenArtist = new ArrayList<String>();
             List<String> seenBands = new ArrayList<String>();
+            List<String> seenAlbums = new ArrayList<String>();
+            List<String> seenSongs = new ArrayList<String>();
             List<String> answerBandMembers = new ArrayList<String>();
             List<String> answerSongNames= new ArrayList<String>();
             String currentArtist = "";
@@ -162,6 +164,7 @@ public class SparqlHelper {
             String currentSong = "";
             String currentAlbum = "";
             String currentReleaseDate = "";
+            String currentYear = "";
             String lastArtist = "";
             String lastBand = "";
             String lastAnswer ="";
@@ -180,41 +183,79 @@ public class SparqlHelper {
                 switch (qType) {
 
                     case 0: //0:Career start of artist/band
-                        //get artist
-                        artist = resolveUTF8(resultVariables.getArtist(sol));
+                        switch (resultCounter) {
+                            case 0:
+                                //get artist
+                                artist = resolveUTF8(resultVariables.getArtist(sol));
 
-                        //get dboStartYear
-                        startYear = resultVariables.getStartYear(sol);
+                                //get dboStartYear
+                                startYear = resultVariables.getStartYear(sol);
 
-                        q.setQUESTION("When did the musical career of \n" + artist + " start?");
-                        q.setANSWER(startYear);
+                                q.setQUESTION("When did the musical career of \n" + artist + " start?");
+                                q.setANSWER(startYear);
 
-                        //ger right answer
-                        rightAnswer = startYear;
+                                //ger right answer
+                                rightAnswer = startYear;
 
-                        wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
-                        wrongAnswer1 = wrongAnswers.get(0);
-                        wrongAnswer2 = wrongAnswers.get(1);
-                        wrongAnswer3 = wrongAnswers.get(2);
-
+                                wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                                wrongAnswer1 = wrongAnswers.get(0);
+                                wrongAnswer2 = wrongAnswers.get(1);
+                                wrongAnswer3 = wrongAnswers.get(2);
+                                resultCounter++;
+                                break;
+                            case 1:
+                                currentYear = resultVariables.getStartYear(sol);
+                                int currentYearInt = Integer.parseInt(currentYear);
+                                int lastYearInt = Integer.parseInt(startYear);
+                                if (currentYearInt < lastYearInt) {
+                                    startYear = currentYear;
+                                    q.setANSWER(startYear);
+                                    rightAnswer = startYear;
+                                    wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                                    wrongAnswer1 = wrongAnswers.get(0);
+                                    wrongAnswer2 = wrongAnswers.get(1);
+                                    wrongAnswer3 = wrongAnswers.get(2);
+                                }
+                                break;
+                        }
                         break;
                     case 1: //0:Career end of artist/band
-                        //get artist
-                        artist = resolveUTF8(resultVariables.getArtist(sol));
+                        switch (resultCounter) {
+                            case 0:
+                                //get artist
+                                artist = resolveUTF8(resultVariables.getArtist(sol));
 
-                        //get dboEndYear (if available)
-                        endYear = resultVariables.getEndYear(sol);
+                                //get dboEndYear (if available)
+                                endYear = resultVariables.getEndYear(sol);
 
-                        q.setQUESTION("When did the musical career of \n" + artist + " (first) end?");
-                        q.setANSWER(endYear);
+                                q.setQUESTION("When did the musical career of \n" + artist + " (first) end?");
+                                q.setANSWER(endYear);
 
-                        //ger right answer
-                        rightAnswer = endYear;
+                                //ger right answer
+                                rightAnswer = endYear;
 
-                        wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
-                        wrongAnswer1 = wrongAnswers.get(0);
-                        wrongAnswer2 = wrongAnswers.get(1);
-                        wrongAnswer3 = wrongAnswers.get(2);
+                                wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                                wrongAnswer1 = wrongAnswers.get(0);
+                                wrongAnswer2 = wrongAnswers.get(1);
+                                wrongAnswer3 = wrongAnswers.get(2);
+                                resultCounter++;
+                                break;
+                            case 1:
+                                currentYear = resultVariables.getEndYear(sol);
+                                int currentYearInt = Integer.parseInt(currentYear);
+                                int lastYearInt = Integer.parseInt(endYear);
+                                if (currentYearInt < lastYearInt) {
+                                    endYear = currentYear;
+                                    q.setANSWER(endYear);
+                                    rightAnswer = endYear;
+                                    wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                                    wrongAnswer1 = wrongAnswers.get(0);
+                                    wrongAnswer2 = wrongAnswers.get(1);
+                                    wrongAnswer3 = wrongAnswers.get(2);
+                                }
+                                break;
+                        }
+
                         break;
                     case 2: //2:hometown of artist/band
                         switch (resultCounter) {
@@ -670,7 +711,7 @@ public class SparqlHelper {
                                 artist = resolveUTF8(resultVariables.getArtist(sol));
                                 //get album
                                 albumname = resolveUTF8(resultVariables.getAlbumname(sol));
-
+                                seenAlbums.add(albumname);
                                 //get album release date
                                 releaseDate = resultVariables.getReleaseDate(sol);
 
@@ -691,13 +732,39 @@ public class SparqlHelper {
                                 currentAlbum = resolveUTF8(resultVariables.getAlbumname(sol));
                                 currentReleaseDate = resolveUTF8(resultVariables.getReleaseDate(sol));
 
-                                album = randomWork.getRandInt(0, musicalWorkMax);
-                                if (album == 0) {
-                                    albumname = currentAlbum;
-                                    q.setQUESTION("When was the album\n" + albumname + "\n from " + artist + " first released?");
-                                    q.setANSWER(currentReleaseDate);
-                                    rightAnswer = currentReleaseDate;
+                                if (albumname.equals(currentAlbum)) {
+                                    int releaseDateInt = Integer.parseInt(releaseDate);
+                                    int currentReleaseDateInt = Integer.parseInt(currentReleaseDate);
+                                    if (currentReleaseDateInt<releaseDateInt) {
+                                        releaseDate = currentReleaseDate;
+                                        rightAnswer = currentReleaseDate;
+                                        q.setANSWER(releaseDate);
+                                        wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                                        wrongAnswer1 = wrongAnswers.get(0);
+                                        wrongAnswer2 = wrongAnswers.get(1);
+                                        wrongAnswer3 = wrongAnswers.get(2);
+                                    }
+
+                                } else {
+                                    boolean containsSameAlbum = false;
+                                    for(String sameAlbum : seenAlbums) {
+                                        if(sameAlbum.equals(currentAlbum)) {
+                                            containsSameAlbum = true;
+                                            break;
+                                        }
+                                    }
+
+                                    album = randomWork.getRandInt(0, musicalWorkMax);
+                                    if (album == 0 && !containsSameAlbum) {
+                                        albumname = currentAlbum;
+                                        q.setQUESTION("When was the album\n" + albumname + "\n from " + artist + " first released?");
+                                        q.setANSWER(currentReleaseDate);
+                                        rightAnswer = currentReleaseDate;
+                                        releaseDate = currentReleaseDate;
+                                    }
                                 }
+                                seenAlbums.add(currentAlbum);
+
 
                                 break;
                         }
@@ -709,7 +776,7 @@ public class SparqlHelper {
                                 artist = resolveUTF8(resultVariables.getArtist(sol));
                                 //get album
                                 songname = resolveUTF8(resultVariables.getSongname(sol));
-
+                                seenSongs.add(songname);
                                 //get album release date
                                 releaseDate = resultVariables.getReleaseDate(sol);
 
@@ -730,13 +797,37 @@ public class SparqlHelper {
                                 currentSong = resolveUTF8(resultVariables.getSongname(sol));
                                 currentReleaseDate = resolveUTF8(resultVariables.getReleaseDate(sol));
 
-                                song = randomWork.getRandInt(0, musicalWorkMax);
-                                if (song == 0) {
-                                    songname = currentSong;
-                                    q.setQUESTION("When was the song\n" + songname + "\n from " + artist + " first released?");
-                                    q.setANSWER(currentReleaseDate);
-                                    rightAnswer = currentReleaseDate;
+                                if(songname.equals(currentSong)) {
+                                    int releaseDateInt = Integer.parseInt(releaseDate);
+                                    int currentReleaseDateInt = Integer.parseInt(currentReleaseDate);
+                                    if(currentReleaseDateInt<releaseDateInt) {
+                                        releaseDate = currentReleaseDate;
+                                        rightAnswer = currentReleaseDate;
+                                        q.setANSWER(releaseDate);
+                                        wrongAnswers = getWrongAnswerOptionsYear(rightAnswer, difficulty);
+                                        wrongAnswer1 = wrongAnswers.get(0);
+                                        wrongAnswer2 = wrongAnswers.get(1);
+                                        wrongAnswer3 = wrongAnswers.get(2);
+                                    }
+                                } else {
+                                    boolean containsSameSong = false;
+                                    for(String sameSong : seenSongs) {
+                                        if(sameSong.equals(currentSong)) {
+                                            containsSameSong = true;
+                                            break;
+                                        }
+                                    }
+                                    song = randomWork.getRandInt(0, musicalWorkMax);
+                                    if (song == 0 && !containsSameSong) {
+                                        songname = currentSong;
+                                        q.setQUESTION("When was the song\n" + songname + "\n from " + artist + " first released?");
+                                        q.setANSWER(currentReleaseDate);
+                                        rightAnswer = currentReleaseDate;
+                                        releaseDate = currentReleaseDate;
+                                    }
+
                                 }
+                                seenSongs.add(currentSong);
 
                                 break;
                         }
@@ -745,8 +836,6 @@ public class SparqlHelper {
 
                 }
             }
-
-
 
 
             RandomInt randomAnswer = new RandomInt();
