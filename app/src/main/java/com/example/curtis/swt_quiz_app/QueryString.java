@@ -353,7 +353,7 @@ public class QueryString {
             if (!fourArtists.contains(artist)) {
                 fourArtists.add(artist);
             }
-            if (fourArtists.size()==4) {
+            if (fourArtists.size()>3) {
                 searching = false;
             }
         }

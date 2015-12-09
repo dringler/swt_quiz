@@ -160,6 +160,7 @@ public class SparqlHelper {
             List<String> answerBandMembers = new ArrayList<String>();
             List<String> answerSongNames= new ArrayList<String>();
             String currentArtist = "";
+            String currentHometown = "";
             String currentBand = "";
             String currentSong = "";
             String currentAlbum = "";
@@ -267,128 +268,184 @@ public class SparqlHelper {
                                 wrongAnswer2 = "Berlin";
                                 wrongAnswer3 = "Hamburg";
                                 //check for next artist without increasing result counter
-                               if (artist.equals(lastArtist) || lastArtist == "") {
-                                   if (!countriesAndStates.contains(hometown)) {
-                                       q.setQUESTION("Where is " + artist + " from?");
-                                       q.setANSWER(hometown);
-                                       rightAnswer = hometown;
-                                       seenArtist.add(artist);
-                                       lastArtist = "";
-                                       resultCounter++;
-                                   } else {
-                                       lastArtist = artist;
-                                       lastAnswer = hometown;
-                                   }
-                                //no valid values in hometown attribute
-                               } else {
-                                   q.setQUESTION("Where is " + lastArtist + " from?");
-                                   q.setANSWER(lastAnswer);
-                                   rightAnswer = lastAnswer;
-                                   seenArtist.add(lastArtist);
-                                   resultCounter++;
-                                   //do case 1 here already as new artist is queried and old artist has no valid attribute
-                                   currentArtist = resolveUTF8(resultVariables.getArtist(sol));
-                                   if (!seenArtist.contains(currentArtist)){
+                                if (artist.equals(lastArtist) || lastArtist == "") {
+                                    if (!countriesAndStates.contains(hometown)) {
+                                        q.setQUESTION("Where is " + artist + " from?");
+                                        q.setANSWER(hometown);
+                                        rightAnswer = hometown;
+                                        seenArtist.add(artist);
+                                        lastArtist = "";
+                                        resultCounter++;
+                                    } else {
+                                        lastArtist = artist;
+                                        lastAnswer = hometown;
+                                    }
+                                    //no valid values in hometown attribute
+                                } else {
+                                    q.setQUESTION("Where is " + lastArtist + " from?");
+                                    q.setANSWER(lastAnswer);
+                                    rightAnswer = lastAnswer;
+                                    seenArtist.add(lastArtist);
+                                    resultCounter++;
+                                    //do case 1 here already as new artist is queried and old artist has no valid attribute
+                                    currentArtist = resolveUTF8(resultVariables.getArtist(sol));
+                                    if (!seenArtist.contains(currentArtist)) {
 
-                                       wrongAnswer1 = resolveUTF8(resultVariables.getHometown(sol));
-                                       if (!countriesAndStates.contains(wrongAnswer1)) {
-                                           seenArtist.add(currentArtist);
-                                           lastArtist = "";
-                                           resultCounter++;
-                                       } else {
-                                           lastArtist = currentArtist;
-                                           lastAnswer = hometown;
-                                       }
-                                   }
-                               }
+                                        currentHometown = resolveUTF8(resultVariables.getHometown(sol));
+                                        if (!currentHometown.equals(rightAnswer)) {
+
+                                            wrongAnswer1 = currentHometown;
+                                            if (!countriesAndStates.contains(wrongAnswer1)) {
+                                                seenArtist.add(currentArtist);
+                                                lastArtist = "";
+                                                resultCounter++;
+                                            } else {
+                                                lastArtist = currentArtist;
+                                                lastAnswer = hometown;
+                                            }
+                                        }
+                                    }
+                                }
                                 break;
                             case 1:
                                 currentArtist = resolveUTF8(resultVariables.getArtist(sol));
-                                if (currentArtist.equals(lastArtist) || lastArtist =="") {
-                                    if (!seenArtist.contains(currentArtist)){
-                                        wrongAnswer1 = resolveUTF8(resultVariables.getHometown(sol));
-                                        if (!countriesAndStates.contains(wrongAnswer1)) {
-                                            seenArtist.add(currentArtist);
-                                            lastArtist = "";
-                                            resultCounter++;
+                                if (currentArtist.equals(lastArtist) || lastArtist == "") {
+                                    if (!seenArtist.contains(currentArtist)) {
+                                        currentHometown = resolveUTF8(resultVariables.getHometown(sol));
+                                        if (!countriesAndStates.contains(currentHometown)) {
+                                            if (currentHometown.equals(rightAnswer)) {
+                                                seenArtist.add(currentArtist);
+                                                //leave placeholder value
+                                                lastArtist = "";
+                                                resultCounter++;
+                                            } else {
+                                                wrongAnswer1 = currentHometown;
+                                                seenArtist.add(currentArtist);
+                                                lastArtist = "";
+                                                resultCounter++;
+                                            }
                                         } else {
                                             lastArtist = currentArtist;
                                             lastAnswer = hometown;
                                         }
+
                                     }
                                 } else {
-                                    wrongAnswer1 = lastAnswer;
+                                    if(!lastAnswer.equals(rightAnswer)) {
+                                        wrongAnswer1 = lastAnswer;
+                                    }
                                     seenArtist.add(lastArtist);
                                     resultCounter++;
                                     //do case 2 already as new artist is queried and old artist has no valid attribute
                                     currentArtist = resolveUTF8(resultVariables.getArtist(sol));
-                                    if (!seenArtist.contains(currentArtist)){
-                                        wrongAnswer2 = resolveUTF8(resultVariables.getHometown(sol));
-                                        if (!countriesAndStates.contains(wrongAnswer2)) {
-                                            seenArtist.add(currentArtist);
-                                            lastArtist = "";
-                                            resultCounter++;
-                                        } else {
-                                            lastArtist = currentArtist;
-                                            lastAnswer = hometown;
+                                    if (!seenArtist.contains(currentArtist)) {
+                                        currentHometown = resolveUTF8(resultVariables.getHometown(sol));
+                                        if (!currentHometown.equals(rightAnswer)) {
+                                            currentHometown = resolveUTF8(resultVariables.getHometown(sol));
+                                            if (!countriesAndStates.contains(currentHometown)) {
+                                                if (currentHometown.equals(rightAnswer) || currentHometown.equals(wrongAnswer1)) {
+                                                    seenArtist.add(currentArtist);
+                                                    //leave placeholder value
+                                                    lastArtist = "";
+                                                    resultCounter++;
+                                                } else {
+                                                    wrongAnswer2 = currentHometown;
+                                                    seenArtist.add(currentArtist);
+                                                    lastArtist = "";
+                                                    resultCounter++;
+                                                }
+                                            } else {
+                                                lastArtist = currentArtist;
+                                                lastAnswer = hometown;
+                                            }
                                         }
                                     }
                                 }
                                 break;
                             case 2:
                                 currentArtist = resolveUTF8(resultVariables.getArtist(sol));
+                                currentHometown = resolveUTF8(resultVariables.getHometown(sol));
                                 if (currentArtist.equals(lastArtist) || lastArtist == "") {
                                     if (!seenArtist.contains(currentArtist)) {
-                                        wrongAnswer2 = resolveUTF8(resultVariables.getHometown(sol));
-                                        if (!countriesAndStates.contains(wrongAnswer2)) {
-                                            seenArtist.add(currentArtist);
-                                            lastArtist = "";
-                                            resultCounter++;
-                                        } else {
-                                            lastArtist = currentArtist;
-                                            lastAnswer = hometown;
+                                            if (!countriesAndStates.contains(currentHometown)) {
+                                                if (currentHometown.equals(rightAnswer)|| currentHometown.equals(wrongAnswer1)) {
+                                                    seenArtist.add(currentArtist);
+                                                    //leave placeholder value
+                                                    lastArtist = "";
+                                                    resultCounter++;
+                                                } else {
+                                                    wrongAnswer2 = currentHometown;
+                                                    seenArtist.add(currentArtist);
+                                                    lastArtist = "";
+                                                    resultCounter++;
+                                                }
+                                            } else {
+                                                lastArtist = currentArtist;
+                                                lastAnswer = hometown;
+                                            }
                                         }
-                                    }
                                 } else {
-                                    wrongAnswer1 = lastAnswer;
+                                    if(!currentHometown.equals(rightAnswer) &&!currentHometown.equals(wrongAnswer1)) {
+                                        wrongAnswer2 = lastAnswer;
+                                    }
                                     seenArtist.add(lastArtist);
                                     resultCounter++;
                                     //do case 2 already as new artist is queried and old artist has no valid attribute
                                     currentArtist = resolveUTF8(resultVariables.getArtist(sol));
-                                    if (!seenArtist.contains(currentArtist)){
-                                        wrongAnswer3 = resolveUTF8(resultVariables.getHometown(sol));
-                                        if (!countriesAndStates.contains(wrongAnswer3)) {
-                                            seenArtist.add(currentArtist);
-                                            lastArtist = "";
-                                            resultCounter++;
-                                        } else {
-                                            lastArtist = currentArtist;
-                                            lastAnswer = hometown;
+                                    if (!seenArtist.contains(currentArtist)) {
+                                        currentHometown = resolveUTF8(resultVariables.getHometown(sol));
+                                        if (!currentHometown.equals(rightAnswer)) {
+                                            currentHometown = resolveUTF8(resultVariables.getHometown(sol));
+                                            if (!countriesAndStates.contains(currentHometown)) {
+                                                if (currentHometown.equals(rightAnswer) || currentHometown.equals(wrongAnswer1) || currentHometown.equals(wrongAnswer2)) {
+                                                    seenArtist.add(currentArtist);
+                                                    //leave placeholder value
+                                                    lastArtist = "";
+                                                    resultCounter++;
+                                                } else {
+                                                    wrongAnswer3 = currentHometown;
+                                                    seenArtist.add(currentArtist);
+                                                    lastArtist = "";
+                                                    resultCounter++;
+                                                }
+                                            } else {
+                                                lastArtist = currentArtist;
+                                                lastAnswer = hometown;
+                                            }
                                         }
                                     }
 
                                 }
                                 break;
                             case 3:
-                                    currentArtist = resolveUTF8(resultVariables.getArtist(sol));
-                                    if (!seenArtist.contains(currentArtist)) {
-                                        wrongAnswer3 = resolveUTF8(resultVariables.getHometown(sol));
-                                        if (!countriesAndStates.contains(wrongAnswer3) || results.hasNext() == false) {
-                                            seenArtist.add(currentArtist);
-                                            lastArtist = "";
-                                            resultCounter++;
-                                            break nextResultLoop;
-                                        }
-                                    }
-                                break;
-                            default:
                                 currentArtist = resolveUTF8(resultVariables.getArtist(sol));
-                                if (!seenArtist.contains(currentArtist)){
-                                    wrongAnswer3 = resolveUTF8(resultVariables.getHometown(sol));
+                                if (!seenArtist.contains(currentArtist)) {
+                                    currentHometown = resolveUTF8(resultVariables.getHometown(sol));
+                                    if (!countriesAndStates.contains(currentHometown) || results.hasNext() == false) {
+                                        if (!currentHometown.equals(rightAnswer) && !currentHometown.equals(wrongAnswer1) && !currentHometown.equals(wrongAnswer2)) {
+                                            wrongAnswer3 = currentHometown;
+                                        }
                                         seenArtist.add(currentArtist);
+                                        lastArtist = "";
+                                        break nextResultLoop;
+                                    }
                                 }
-                                break;
+
+                            break;
+                    default:
+                        currentArtist = resolveUTF8(resultVariables.getArtist(sol));
+                        if (!seenArtist.contains(currentArtist)) {
+                            currentHometown = resolveUTF8(resultVariables.getHometown(sol));
+                            if (!currentHometown.equals(rightAnswer)) {
+                                if (!currentHometown.equals(rightAnswer)) {
+                                    wrongAnswer3 = currentHometown;
+                                }
+                                seenArtist.add(currentArtist);
+                            }
                         }
+                        break;
+                }
+
                         continue nextResultLoop;
                     case 3: //3:which album is from the following artist/band
                         switch (resultCounter) {
