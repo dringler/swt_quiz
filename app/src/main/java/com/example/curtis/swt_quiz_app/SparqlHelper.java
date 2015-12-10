@@ -973,21 +973,26 @@ public class SparqlHelper {
             while(containsHex) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 //get beginning of hex substring
-                indexHexB = resolveString.indexOf("%");
+                indexHexB = result.indexOf("%");
                 //get end of hex substring (+3 as "%" is included)
                 indexHexE = indexHexB + 3;
                 //get full hex substring that should be replaced
-                resolveHex = resolveString.substring(indexHexB, indexHexE);
+                resolveHex = result.substring(indexHexB, indexHexE);
                 //get substring with hex sequence to be resolved
-                resolveHexSeq = resolveString.substring(indexHexB+1, indexHexE);
-                //resolve hex sequence
-                int byteVal = Integer.parseInt(resolveHexSeq, 16);
-                baos.write(byteVal);
-                //get resolved symbol
-                resolvedHex = new String(baos.toByteArray(), Charset.forName("UTF-8"));
+                resolveHexSeq = result.substring(indexHexB+1, indexHexE);
+                //check hex sequence for quotation marks
+                if(resolveHexSeq.equals("22")) {
+                    result = result.replace(resolveHex, "");
+                } else {
+                    //resolve hex sequence
+                    int byteVal = Integer.parseInt(resolveHexSeq, 16);
+                    baos.write(byteVal);
+                    //get resolved symbol
+                    resolvedHex = new String(baos.toByteArray(), Charset.forName("UTF-8"));
 
-                //replace full hex substring (including "%") with resolved symbol
-                result = result.replace(resolveHex, resolvedHex);
+                    //replace full hex substring (including "%") with resolved symbol
+                    result = result.replace(resolveHex, resolvedHex);
+                }
                 //check if more hex substrings are contained
                 if(!result.contains("%")) {
                     containsHex = false;
