@@ -28,8 +28,8 @@ public class MainActivity extends AppCompatActivity {
         et.setFilters(new InputFilter[]{new InputFilterMinMax(minQ, maxQ)});
 
         //set placeholder name
-        EditText pn = (EditText) findViewById(R.id.editTextName);
-        pn.setText("Dan");
+//        EditText pn = (EditText) findViewById(R.id.editTextName);
+//        pn.setText("Dan");
     }
 
     /** Called when the user clicks the Start Quiz button */
