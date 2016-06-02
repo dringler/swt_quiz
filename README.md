@@ -1,2 +1,4 @@
 # swt_quiz_app
-Android Semantic Web Quiz Application
+Android Semantic Web Quiz Application for the Semantic Web Technologies course at the University of Mannheim.
+
+The app does not prestore the quesiton and answer possibilities for the quiz. Everything is queried randomly and dynamically from DBpedia. Only lists of the most popular artists and bands are stored on the device.
